@@ -12,10 +12,12 @@ import { RouteChildrenProps } from "react-router";
 import { UpdateIdiom } from "../pages/UpdateIdiom";
 import { ChangeProposals } from "../pages/ChangeProposals";
 import { SearchBox } from "./SearchBox";
+import { GetCurrentUser_me } from "../__generated__/types";
 const { Header, Footer, Content } = Layout;
 
 export interface AppProps {
   subTitle?: string;
+  serverUser?: GetCurrentUser_me;
 }
 
 function AppInternal(props: RouteComponentProps<any> & AppProps) {

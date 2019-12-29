@@ -13,6 +13,7 @@ import { ApolloProvider } from "@apollo/react-common";
 import { createHttpLink } from "apollo-link-http";
 import fetch from "cross-fetch";
 import { JSDOM } from "jsdom";
+import { UserModel } from './model/types';
 
 // When running in staging or prod we setup to run using SSR for improved performance
 export function setupSSR(app: express.Application, clientPath: string, localPort: number) {
@@ -54,7 +55,8 @@ function render(req: express.Request, res: express.Response, clientPath: string,
 
   cache.writeData({
     data: {
-      subTitle: subTitle
+      subTitle: subTitle,
+      serverUser: req.user as UserModel
     }
   });
 

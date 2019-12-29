@@ -3,14 +3,18 @@ import * as React from "react";
 import { Menu, Icon, Avatar, Button } from "antd";
 import { Link, RouteComponentProps } from "react-router-dom";
 import { useCurrentUser } from "./withCurrentUser";
+import { GetCurrentUser_me } from "../__generated__/types";
 
-export interface NavCommandBarProps {}
+export interface NavCommandBarProps {
+  serverUser?: GetCurrentUser_me;
+}
 
 type NavBarCombinedProps = RouteComponentProps<any> & NavCommandBarProps;
 
 export const NavCommandBar: React.StatelessComponent<NavBarCombinedProps> = props => {
   const { currentUser } = useCurrentUser();
-  const isLoggedIn = !!currentUser;
+  const isLoggedIn = !!currentUser || !!props.serverUser;
+  const activeUser = props.serverUser || currentUser;
 
   return (
     <Menu mode="horizontal" selectable={false} className="navCommandBar">
@@ -50,8 +54,8 @@ export const NavCommandBar: React.StatelessComponent<NavBarCombinedProps> = prop
         )}
         {isLoggedIn && (
           <Link to="/me">
-            <Avatar src={currentUser!.avatar || ""} size="small" className="profileImage" />
-            {currentUser!.name}
+            <Avatar src={activeUser!.avatar || ""} size="small" className="profileImage" />
+            {activeUser!.name}
           </Link>
         )}
       </Menu.Item>
