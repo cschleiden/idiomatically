@@ -21,5 +21,7 @@ export default gql`
     countryName: String!
     countryNativeName: String!
     emojiFlag: String!
+    latitude: Float!
+    longitude: Float!
   }
 `;

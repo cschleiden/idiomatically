@@ -83,7 +83,6 @@ const start = async () => {
     setupAuthAndSession(mongoConnection, app, serverUrl, clientUrl, dataProviders, isProd, googleClientId, googleClientSecret);
 
     server.applyMiddleware({ app, cors: false });
-    debugger;
     const httpServer = http.createServer(app);
 
     httpServer.listen({ port: port }, () =>

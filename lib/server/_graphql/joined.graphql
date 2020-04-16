@@ -135,6 +135,8 @@ type Country @cacheControl(maxAge: 3600) {
   countryName: String!
   countryNativeName: String!
   emojiFlag: String!
+  latitude: Float!
+  longitude: Float!
 }
 
 type IdiomChangeProposalConnection {

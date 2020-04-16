@@ -23,6 +23,8 @@ export type Country = {
   countryName: Scalars['String'],
   countryNativeName: Scalars['String'],
   emojiFlag: Scalars['String'],
+  latitude: Scalars['Float'],
+  longitude: Scalars['Float'],
 };
 
 export type Idiom = {
@@ -344,6 +346,7 @@ export type ResolversTypes = {
   Idiom: ResolverTypeWrapper<Idiom>,
   Language: ResolverTypeWrapper<Language>,
   Country: ResolverTypeWrapper<Country>,
+  Float: ResolverTypeWrapper<Scalars['Float']>,
   IdiomConnection: ResolverTypeWrapper<IdiomConnection>,
   IdiomEdge: ResolverTypeWrapper<IdiomEdge>,
   PageInfo: ResolverTypeWrapper<PageInfo>,
@@ -372,6 +375,7 @@ export type ResolversParentTypes = {
   Idiom: Idiom,
   Language: Language,
   Country: Country,
+  Float: Scalars['Float'],
   IdiomConnection: IdiomConnection,
   IdiomEdge: IdiomEdge,
   PageInfo: PageInfo,
@@ -397,6 +401,8 @@ export type CountryResolvers<ContextType = any, ParentType extends ResolversPare
   countryName?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   countryNativeName?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   emojiFlag?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  latitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>,
+  longitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>,
 };
 
 export type IdiomResolvers<ContextType = any, ParentType extends ResolversParentTypes['Idiom'] = ResolversParentTypes['Idiom']> = {

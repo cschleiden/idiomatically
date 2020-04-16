@@ -1,6 +1,7 @@
 import * as countryLanguage from 'country-language'
 import { languagesAll, languages as langaugesList, countries, Country, Language } from 'countries-list';
-
+import worldCountries from 'world-countries'
+type WorldCountry = import("world-countries").Country;
 
 export interface LanguageModel {
     languageName: string,
@@ -14,6 +15,8 @@ export interface CountryModel {
     countryName: string,
     countryNativeName: string,
     emojiFlag: string,
+    latitude: number,
+    longitude: number
 }
 
 export class Languages {
@@ -21,7 +24,7 @@ export class Languages {
     private languageMap: Map<string, LanguageModel> = new Map();
     private countryMap: Map<string, CountryModel> = new Map();
     private static _instance: Languages;
-
+    private worldCountriesMap: Map<string, WorldCountry> = new Map();
     public static get Instance() {
         return this._instance || (this._instance = new this());
     }
@@ -33,13 +36,28 @@ export class Languages {
     }
 
     private initialize() {
+
+        // Build map of world countries which we use for 
+        // getting the longitude and latitude
+        // It also has languages with the 3 letter code if needed
+        for (let i = 0; i < worldCountries.length; i++) {
+            const worldCountry = worldCountries[i];
+            this.worldCountriesMap.set(worldCountry.cca2, worldCountry);
+        }
+
         for (const countryCode of Object.keys(countries)) {
             const country: Country = countries[countryCode];
+
+            // Grab from world country map to get lang/lat
+            const worldCountry: WorldCountry = this.worldCountriesMap.get(countryCode);
+            
             const countryModel: CountryModel = {
                 countryName: country.name,
                 countryNativeName: country.native,
                 countryKey: countryCode,
-                emojiFlag: country.emoji
+                emojiFlag: country.emoji,
+                latitude: worldCountry && worldCountry.latlng[0],
+                longitude: worldCountry && worldCountry.latlng[1]
             };
             this.countryMap.set(countryModel.countryKey.toLowerCase(), countryModel);
 

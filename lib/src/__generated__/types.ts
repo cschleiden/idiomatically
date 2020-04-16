@@ -40,6 +40,8 @@ export interface FindIdiomsQuery_idioms_edges_node_language_countries {
   countryKey: string;
   countryName: string;
   emojiFlag: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface FindIdiomsQuery_idioms_edges_node_language {
@@ -196,6 +198,8 @@ export interface GetIdiomQuery_idiom_language_countries {
   countryKey: string;
   countryName: string;
   emojiFlag: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface GetIdiomQuery_idiom_language {
@@ -210,6 +214,8 @@ export interface GetIdiomQuery_idiom_equivalents_language_countries {
   countryKey: string;
   countryName: string;
   emojiFlag: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface GetIdiomQuery_idiom_equivalents_language {
@@ -382,6 +388,8 @@ export interface GetIdiomListQuery_idioms_edges_node_language_countries {
   countryKey: string;
   countryName: string;
   emojiFlag: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface GetIdiomListQuery_idioms_edges_node_language {
@@ -396,6 +404,8 @@ export interface GetIdiomListQuery_idioms_edges_node_equivalents_language_countr
   countryKey: string;
   countryName: string;
   emojiFlag: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface GetIdiomListQuery_idioms_edges_node_equivalents_language {
@@ -463,6 +473,8 @@ export interface CreateIdiomMutation_createIdiom_idiom_language_countries {
   countryKey: string;
   countryName: string;
   emojiFlag: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface CreateIdiomMutation_createIdiom_idiom_language {
@@ -477,6 +489,8 @@ export interface CreateIdiomMutation_createIdiom_idiom_equivalents_language_coun
   countryKey: string;
   countryName: string;
   emojiFlag: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface CreateIdiomMutation_createIdiom_idiom_equivalents_language {
@@ -542,6 +556,8 @@ export interface UpdateIdiomMutation_updateIdiom_idiom_language_countries {
   countryKey: string;
   countryName: string;
   emojiFlag: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface UpdateIdiomMutation_updateIdiom_idiom_language {
@@ -556,6 +572,8 @@ export interface UpdateIdiomMutation_updateIdiom_idiom_equivalents_language_coun
   countryKey: string;
   countryName: string;
   emojiFlag: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface UpdateIdiomMutation_updateIdiom_idiom_equivalents_language {
@@ -620,6 +638,8 @@ export interface FullIdiomEntry_language_countries {
   countryKey: string;
   countryName: string;
   emojiFlag: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface FullIdiomEntry_language {
@@ -634,6 +654,8 @@ export interface FullIdiomEntry_equivalents_language_countries {
   countryKey: string;
   countryName: string;
   emojiFlag: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface FullIdiomEntry_equivalents_language {
@@ -678,6 +700,8 @@ export interface MinimalIdiomEntry_language_countries {
   countryKey: string;
   countryName: string;
   emojiFlag: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface MinimalIdiomEntry_language {

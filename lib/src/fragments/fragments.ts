@@ -15,6 +15,8 @@ fragment FullIdiomEntry on Idiom {
             countryKey
             countryName
             emojiFlag
+            latitude
+            longitude
         }
     }
     equivalents {
@@ -30,6 +32,8 @@ fragment FullIdiomEntry on Idiom {
                 countryKey
                 countryName
                 emojiFlag
+                latitude
+                longitude
             }
         }
     }
@@ -49,6 +53,8 @@ fragment MinimalIdiomEntry on Idiom {
             countryKey
             countryName
             emojiFlag
+            latitude
+            longitude
         }
     } 
 }`;
