@@ -117,7 +117,7 @@ export const AddEquivalentSection: React.StatelessComponent<AddEquivalentListPro
         <Text className="addEquivalentDescription">Search to find an idiom to correlate with</Text>
         <div className="addExistingFindBox">
           <Select<string>
-            mode="default"
+            mode="multiple"
             showSearch
             value={selectedIdiomState.idiom ? selectedIdiomState.idiom.id! : undefined}
             placeholder="Find an idiom"

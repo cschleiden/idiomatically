@@ -1,5 +1,6 @@
 import { FullIdiomEntry } from "../__generated__/types";
-import { Form, Input, Tooltip, Button, Icon } from "antd";
+import { Form, Input, Tooltip, Button } from "antd";
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import { GetFieldDecoratorOptions } from "antd/lib/form/Form";
 import TextArea from "antd/lib/input/TextArea";
 import { LanguageSelect } from "./LanguageSelect";
@@ -40,7 +41,7 @@ export function commonFormItems(
           <span>
             Idiom (In the langauges own alphabet) &nbsp;
             <Tooltip title="eg. Water under the bridge or 一石二鸟">
-              <Icon type="question-circle-o" />
+              <QuestionCircleOutlined />
             </Tooltip>
           </span>
         }
@@ -64,7 +65,7 @@ export function commonFormItems(
             <span>
               Language&nbsp;
               <Tooltip title="The language of the idiom">
-                <Icon type="question-circle-o" />
+                <QuestionCircleOutlined />
               </Tooltip>
             </span>
           }
@@ -89,7 +90,7 @@ export function commonFormItems(
           <span>
             Country&nbsp;
             <Tooltip title="The countries where this idiom is used in that language">
-              <Icon type="question-circle-o" />
+              <QuestionCircleOutlined />
             </Tooltip>
           </span>
         }
@@ -113,7 +114,7 @@ export function commonFormItems(
             <span>
               Literal Translation (In English)&nbsp;
               <Tooltip title="Translate the idiom word for word to English (if it is not already English)">
-                <Icon type="question-circle-o" />
+                <QuestionCircleOutlined />
               </Tooltip>
             </span>
           }
@@ -137,7 +138,7 @@ export function commonFormItems(
           <span>
             Description&nbsp;
             <Tooltip title="Details about the idiom (markdown supported)">
-              <Icon type="question-circle-o" />
+              <QuestionCircleOutlined />
             </Tooltip>
           </span>
         }
@@ -160,7 +161,7 @@ export function commonFormItems(
             <span>
               Transliteration (How to pronounce it with English characters)&nbsp;
               <Tooltip title="Write the idiom with Latin characters to aid in pronunciation (like Pinyin for Chinese)">
-                <Icon type="question-circle-o" />
+                <QuestionCircleOutlined />
               </Tooltip>
             </span>
           }
