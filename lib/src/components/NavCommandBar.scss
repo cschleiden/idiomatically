@@ -1,22 +1,25 @@
 @import "App.scss";
 
-.navCommandBar {
-  border-bottom: none;
-  align-self: flex-start;
-  width: 100%;
-}
-
-.ant-menu-item {
-  .profileImage {
-    margin-right: 10px;
+.ant-layout-header {
+  .navCommandBar {
+    border-bottom: none;
+    align-self: flex-start;
+    width: 100%;
+    line-height: 46px;
   }
 
-  .ant-btn {
-    padding-left: 0;
-    padding-right: 0;
+  .ant-menu-item {
+    .profileImage {
+      margin-right: 10px;
+    }
 
-    & > .anticon + span {
-      margin-left: 0;
+    .ant-btn {
+      padding-left: 0;
+      padding-right: 0;
+
+      & > .anticon + span {
+        margin-left: 0;
+      }
     }
   }
 }

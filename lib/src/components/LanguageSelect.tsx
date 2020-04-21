@@ -17,8 +17,7 @@ export const getLanguagesQuery = gql`
 
 export interface LanguageSelectProps {
   onChange?: (
-    value: string,
-    option: React.ReactElement<any> | React.ReactElement<any>[]
+    value: string
   ) => void;
 }
 

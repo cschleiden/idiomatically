@@ -1,5 +1,6 @@
 import * as React from "react";
 import "./Profile.scss";
+import { PoweroffOutlined } from '@ant-design/icons';
 import { Avatar, Typography, Button, Spin } from "antd";
 import { useState } from "react";
 import { Redirect } from "react-router";
@@ -61,35 +62,33 @@ export const Profile: React.StatelessComponent<ProfileProps> = props => {
 
   const showAdminLinks = currentUser && !currentUserLoading && currentUser.role === UserRole.ADMIN;
   const role = getRoleInfo(currentUser.role);
-  return (
-    <>
-      <Title>{currentUser.name}</Title>
-      <div className="profileContent">
-        <Avatar className="profilePicture" size={150} src={currentUser.avatar || ""} shape="square" />
-        <div className="profileActions">
-          <div>
-            <h3>Role</h3>
-            <div className="roleName">{role.displayName}</div>
-            <div className="roleDescription">{role.description}</div>
-          </div>
-          <div>
-            <h3>Actions</h3>
-            <ul>
-              {showAdminLinks && (
-                <li>
-                  <Link to="/admin/proposals">Review Proposals</Link>
-                </li>
-              )}
-
+  return <>
+    <Title>{currentUser.name}</Title>
+    <div className="profileContent">
+      <Avatar className="profilePicture" size={150} src={currentUser.avatar || ""} shape="square" />
+      <div className="profileActions">
+        <div>
+          <h3>Role</h3>
+          <div className="roleName">{role.displayName}</div>
+          <div className="roleDescription">{role.description}</div>
+        </div>
+        <div>
+          <h3>Actions</h3>
+          <ul>
+            {showAdminLinks && (
               <li>
-                <Button type="primary" icon="poweroff" loading={isLoggingOut} onClick={logOut}>
-                  Log out
-                </Button>
+                <Link to="/admin/proposals">Review Proposals</Link>
               </li>
-            </ul>
-          </div>
+            )}
+
+            <li>
+              <Button type="primary" icon={<PoweroffOutlined />} loading={isLoggingOut} onClick={logOut}>
+                Log out
+              </Button>
+            </li>
+          </ul>
         </div>
       </div>
-    </>
-  );
+    </div>
+  </>;
 };

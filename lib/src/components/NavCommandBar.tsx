@@ -1,6 +1,7 @@
 import "./NavCommandBar.scss";
 import * as React from "react";
-import { Menu, Icon, Avatar, Button } from "antd";
+import { HomeOutlined, InfoCircleOutlined, LoginOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { Menu, Avatar, Button } from "antd";
 import { Link, RouteComponentProps } from "react-router-dom";
 import { useCurrentUser } from "./withCurrentUser";
 
@@ -16,13 +17,13 @@ export const NavCommandBar: React.StatelessComponent<NavBarCombinedProps> = prop
     <Menu mode="horizontal" selectable={false} className="navCommandBar">
       <Menu.Item key="home">
         <Link to="/">
-          <Icon type="home" />
+          <HomeOutlined />
           Home
         </Link>
       </Menu.Item>
       <Menu.Item key="about">
         <Link to="/about">
-          <Icon type="info-circle" />
+          <InfoCircleOutlined />
           About
         </Link>
       </Menu.Item>
@@ -31,8 +32,8 @@ export const NavCommandBar: React.StatelessComponent<NavBarCombinedProps> = prop
         <Menu.Item>
           <Button
             type="link"
-            icon="plus-circle"
-            size="default"
+            icon={<PlusCircleOutlined />}
+            size="middle"
             onClick={() => {
               props.history.push("/new");
             }}
@@ -44,7 +45,7 @@ export const NavCommandBar: React.StatelessComponent<NavBarCombinedProps> = prop
       <Menu.Item key="user" className="userMenuItem">
         {!isLoggedIn && (
           <a href={`${process.env.REACT_APP_SERVER}/login?returnTo=${props.history.location.pathname}`}>
-            <Icon type="login" />
+            <LoginOutlined />
             Login
           </a>
         )}

@@ -11,11 +11,13 @@ import {
 } from "../__generated__/types";
 import gql from "graphql-tag";
 import "./ChangeProposals.scss";
-import { Alert, Spin, List, Empty, Icon, Button } from "antd";
+import { CheckCircleFilled, ClockCircleFilled, CloseCircleFilled } from '@ant-design/icons';
+import { Alert, Spin, List, Empty, Button } from "antd";
 import { Link, Redirect } from "react-router-dom";
 import { useLazyQuery, useMutation } from "@apollo/react-hooks";
 import { JsonEditor } from "../components/JsonEditor";
 import { useCurrentUser } from "../components/withCurrentUser";
+import { useEffect } from "react";
 
 export const getChangeProposalsQuery = gql`
   query GetChangeProposalsQuery($filter: String, $limit: Int, $cursor: String) {
@@ -71,6 +73,10 @@ export const ChangeProposals: React.StatelessComponent<ChangeProposalsProps> = p
   );
   const pageSize = 10;
 
+  useEffect(() => {
+    setLastFilter(props.filter);
+  }, [props.filter]);
+
   if (currentUserLoading) {
     return <Spin spinning delay={500} className="middleSpinner" tip="Loading..." />;
   } else if (!currentUser) {
@@ -93,7 +99,6 @@ export const ChangeProposals: React.StatelessComponent<ChangeProposalsProps> = p
     queryPage({
       variables: { filter, limit: pageSize, cursor: currCursorNum.toString() }
     });
-    setLastFilter(props.filter);
   }
   if (loadResult.loading) return <Spin delay={500} className="middleSpinner" tip="Loading..." />;
   if (loadResult.error) return <Alert message="Error" type="error" description={loadResult.error.message} showIcon />;
@@ -189,7 +194,7 @@ export const ChangeProposalItem: React.StatelessComponent<ChangeProposalItemProp
   const acceptAction = (
     <span>
       <Button onClick={acceptProposal} type="link">
-        <Icon type="check-circle" className="acceptButton proposalButton" theme="filled" />
+        <CheckCircleFilled className="acceptButton proposalButton" />
         {confirmAccept ? "Are you sure?" : "Accept Proposal"}
       </Button>
     </span>
@@ -198,7 +203,7 @@ export const ChangeProposalItem: React.StatelessComponent<ChangeProposalItemProp
   const rejectAction = (
     <span>
       <Button onClick={rejectProposal} type="link">
-        <Icon type="close-circle" className="rejectButton proposalButton" theme="filled" />
+        <CloseCircleFilled className="rejectButton proposalButton" />
         {confirmReject ? "Are you sure?" : "Reject Proposal"}
       </Button>
     </span>
@@ -207,7 +212,7 @@ export const ChangeProposalItem: React.StatelessComponent<ChangeProposalItemProp
   const resetAction = (
     <span>
       <Button onClick={resetProposal} type="link">
-        <Icon type="clock-circle" className="resetButton proposalButton" theme="filled" />
+        <ClockCircleFilled className="resetButton proposalButton" />
         Reset Proposal
       </Button>
     </span>

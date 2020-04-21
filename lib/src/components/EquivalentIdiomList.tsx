@@ -10,7 +10,8 @@ import {
   MinimalIdiomEntry
 } from "../__generated__/types";
 import { useMutation } from "@apollo/react-hooks";
-import { Button, Icon, Typography } from "antd";
+import { DeleteFilled } from '@ant-design/icons';
+import { Button, Typography } from "antd";
 import gql from "graphql-tag";
 import "./EquivalentIdiomList.scss";
 import { IdiomListRenderer, renderIdiomListItem } from "./IdiomListRenderer";
@@ -118,7 +119,7 @@ const EquivalentIdiomItem: React.StatelessComponent<EquivalentItemProps> = props
       type="link"
       className="removeEquivalentButton"
     >
-      <Icon type="delete" className="removeEquivalentIcon" theme="filled" />
+      <DeleteFilled className="removeEquivalentIcon" />
       {confirmRemove ? "Are you sure?" : ""}
     </Button>
   );

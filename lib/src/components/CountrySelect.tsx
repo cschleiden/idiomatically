@@ -22,8 +22,7 @@ export interface CountrySelectProps {
   initialValue?: string[];
   languageKey?: string;
   onChange?: (
-    value: string[],
-    option: React.ReactElement<any> | React.ReactElement<any>[]
+    value: string[]
   ) => void;
 }
 

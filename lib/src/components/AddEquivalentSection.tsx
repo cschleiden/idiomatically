@@ -14,6 +14,7 @@ import { useMutation, useLazyQuery } from "@apollo/react-hooks";
 import { MINIMAL_IDIOM_ENTRY } from "../fragments/fragments";
 import gql from "graphql-tag";
 import "./AddEquivalentSection.scss";
+import { PlusCircleOutlined } from '@ant-design/icons';
 import { Alert, Spin, Button, Select, Typography } from "antd";
 import { IdiomRenderer } from "./IdiomRenderer";
 const { Option } = Select;
@@ -92,7 +93,7 @@ export const AddEquivalentSection: React.StatelessComponent<AddEquivalentListPro
   };
   if (!props.user) {
     return (
-      <Button type="link" icon="plus-circle" onClick={e => loginClick(e, props.idiom!.slug, props.history)}>
+      <Button type="link" icon={<PlusCircleOutlined />} onClick={e => loginClick(e, props.idiom!.slug, props.history)}>
         Login to correlate with other idioms
       </Button>
     );
@@ -108,55 +109,52 @@ export const AddEquivalentSection: React.StatelessComponent<AddEquivalentListPro
     </Button>
   );
 
-  return (
-    <>
-      <Title level={4}>Contribute</Title>
-      <Paragraph className="info">Add idioms that are equivalent to this one in other languages and locales.</Paragraph>
-      <Paragraph className="content addEquivalent addExisting">
-        <Text strong>Find an existing idiom...</Text>
-        <Text className="addEquivalentDescription">Search to find an idiom to correlate with</Text>
-        <div className="addExistingFindBox">
-          <Select<string>
-            mode="multiple"
-            showSearch
-            value={selectedIdiomState.idiom ? selectedIdiomState.idiom.id! : undefined}
-            placeholder="Find an idiom"
-            notFoundContent={fetching ? <Spin size="small" /> : null}
-            filterOption={false}
-            onSearch={fetchUser}
-            onChange={handleChange}
-            className="findSelectControl"
-          >
-            {findData.map(d => (
-              <Option key={d.node.id} value={d.node.id}>
-                <IdiomRenderer idiom={d.node} hideFlags={true} disableLink={true} />
-              </Option>
-            ))}
-          </Select>
-        </div>
-        {selectedIdiomState.idiom && selectedIdiomState.status !== undefined && (
-          <Alert
-            className="addEquivalentResult"
-            message={getMessageFromStatus(selectedIdiomState.status)}
-            type={getSuccessFromStatus(selectedIdiomState.status) ? "success" : "error"}
-          />
-        )}
+  return <>
+    <Title level={4}>Contribute</Title>
+    <Paragraph className="info">Add idioms that are equivalent to this one in other languages and locales.</Paragraph>
+    <Paragraph className="content addEquivalent addExisting">
+      <Text strong>Find an existing idiom...</Text>
+      <Text className="addEquivalentDescription">Search to find an idiom to correlate with</Text>
+      <div className="addExistingFindBox">
+        <Select<string>
+          showSearch
+          value={selectedIdiomState.idiom ? selectedIdiomState.idiom.id! : undefined}
+          placeholder="Find an idiom"
+          notFoundContent={fetching ? <Spin size="small" /> : null}
+          filterOption={false}
+          onSearch={fetchUser}
+          onChange={handleChange}
+          className="findSelectControl"
+        >
+          {findData.map(d => (
+            <Option key={d.node.id} value={d.node.id}>
+              <IdiomRenderer idiom={d.node} hideFlags={true} disableLink={true} />
+            </Option>
+          ))}
+        </Select>
+      </div>
+      {selectedIdiomState.idiom && selectedIdiomState.status !== undefined && (
+        <Alert
+          className="addEquivalentResult"
+          message={getMessageFromStatus(selectedIdiomState.status)}
+          type={getSuccessFromStatus(selectedIdiomState.status) ? "success" : "error"}
+        />
+      )}
 
-        {selectedIdiomState.idiom && selectedIdiomState.status === undefined && (
-          <IdiomRenderer idiom={selectedIdiomState.idiom} actions={actions} />
-        )}
-      </Paragraph>
-      <Paragraph className="content addEquivalent addNew">
-        <Text strong>Add a new idiom...</Text>
-        <Text className="addEquivalentDescription">If the idiom doesn't exist on the site yet, please add it</Text>
-        <div>
-          <Button type="link" icon="plus-circle" onClick={e => handleAddEquivalentClick(e, props.idiom!.id, props.history)}>
-            Add idiom
-          </Button>
-        </div>
-      </Paragraph>
-    </>
-  );
+      {selectedIdiomState.idiom && selectedIdiomState.status === undefined && (
+        <IdiomRenderer idiom={selectedIdiomState.idiom} actions={actions} />
+      )}
+    </Paragraph>
+    <Paragraph className="content addEquivalent addNew">
+      <Text strong>Add a new idiom...</Text>
+      <Text className="addEquivalentDescription">If the idiom doesn't exist on the site yet, please add it</Text>
+      <div>
+        <Button type="link" icon={<PlusCircleOutlined />} onClick={e => handleAddEquivalentClick(e, props.idiom!.id, props.history)}>
+          Add idiom
+        </Button>
+      </div>
+    </Paragraph>
+  </>;
 };
 
 const getMessageFromStatus = (status: OperationStatus) => {

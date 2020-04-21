@@ -41,12 +41,12 @@ article.idiom {
   h3 {
     margin-top: 6px;
 
-    i.anticon {
+    span.anticon {
       font-size: 19px;
       vertical-align: middle;
     }
-    i.anticon-copy,
-    i.anticon-edit {
+    span.anticon-copy,
+    span.anticon-edit {
       color: #ccc;
 
       &:hover {

@@ -10,17 +10,22 @@
     box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
   }
   .ant-select-focused .ant-select-selection {
-    color: inherit;
+    color: white;
   }
   .ant-input-group-addon .ant-select {
     margin: -5px 0px;
   }
-  .languageSelect {
+  
+  .ant-select.languageSelect {
     border-left: 1px solid #0069cc;
-    color: inherit;
+    color: white;
 
     .ant-select-arrow {
-      color: inherit;
+      color: white;
+    }
+
+    .ant-select-selector {
+      color: white;
     }
 
     .ant-select-selection-selected-value {

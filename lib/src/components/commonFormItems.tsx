@@ -1,7 +1,9 @@
 import { FullIdiomEntry } from "../__generated__/types";
-import { Form, Input, Tooltip, Button } from "antd";
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Input, Tooltip, Button } from "antd";
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { GetFieldDecoratorOptions } from "antd/lib/form/Form";
+import { GetFieldDecoratorOptions } from "@ant-design/compatible/lib/form/Form";
 import TextArea from "antd/lib/input/TextArea";
 import { LanguageSelect } from "./LanguageSelect";
 import { CountrySelect } from "./CountrySelect";

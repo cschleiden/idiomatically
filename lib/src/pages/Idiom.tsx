@@ -19,7 +19,8 @@ import marked from "marked";
 import dompurifyFactory from "dompurify";
 import { AddEquivalentSection } from "../components/AddEquivalentSection";
 import { EquivalentIdiomList } from "../components/EquivalentIdiomList";
-import { Typography, Alert, Spin, Button, PageHeader, Icon } from "antd";
+import { DeleteFilled } from '@ant-design/icons';
+import { Typography, Alert, Spin, Button, PageHeader } from "antd";
 const { Title, Paragraph } = Typography;
 
 export const deleteIdiomQuery = gql`
@@ -86,7 +87,7 @@ export const Idiom: React.StatelessComponent<IdiomCombinedProps> = props => {
           }
         }}
       >
-        {deleteConfirmation === DeleteActionState.Proposed ? "Are you sure?" : <Icon type="delete" theme="filled" />}
+        {deleteConfirmation === DeleteActionState.Proposed ? "Are you sure?" : <DeleteFilled />}
       </Button>
     )
   ];

@@ -8,8 +8,10 @@ import {
 } from "../__generated__/types";
 import gql from "graphql-tag";
 import "./NewIdiom.scss";
-import { Typography, Alert, Spin, Form } from "antd";
-import { WrappedFormInternalProps } from "antd/lib/form/Form";
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Typography, Alert, Spin } from "antd";
+import { WrappedFormInternalProps } from "@ant-design/compatible/lib/form/Form";
 import { IDictionary } from "../types";
 import { FormEvent } from "react";
 import { Redirect } from "react-router";
