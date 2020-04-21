@@ -9,6 +9,7 @@ import { Alert, Spin, Empty } from "antd";
 import { FULL_IDIOM_ENTRY } from "../fragments/fragments";
 import { useLazyQuery } from "@apollo/react-hooks";
 import { IdiomListRenderer } from "../components/IdiomListRenderer";
+import { useEffect } from "react";
 
 export const getIdiomListQuery = gql`
   query GetIdiomListQuery(
@@ -50,6 +51,11 @@ export const IdiomListView: React.StatelessComponent<IdiomListViewProps> = props
   const pageSize = 10;
   const locale = language && language.toLowerCase() === "all" ? null : language;
 
+  useEffect(() => {
+    setLastFilter(props.filter);
+    setLastLang(props.language);
+  }, [props.filter, props.language]);
+
   // Based on the page number we get from state we calculate the bounds of the cursors
   // we then check if the data we current have has a endCursor that falls in that range. If so,
   // we have the data for this page, no need to query. Otherwise, run the query.
@@ -80,9 +86,8 @@ export const IdiomListView: React.StatelessComponent<IdiomListViewProps> = props
         cursor: currCursorNum.toString()
       }
     });
-    setLastFilter(props.filter);
-    setLastLang(props.language);
   }
+
   if (loadResult.loading)
     return <Spin delay={500} className="middleSpinner" tip="Loading..." />;
   if (loadResult.error)

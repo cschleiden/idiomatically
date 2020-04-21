@@ -105,7 +105,7 @@ const start = async () => {
 
     app.get("/login", (req, res) => {
       const authUrl = "/auth/google";
-      const returnTo = req.query["returnTo"];
+      const returnTo = req.query["returnTo"] as string;
       const url_parts = returnTo ? url.parse(returnTo) : null;
       const path = url_parts ? url_parts.pathname : "";
       const returnPath = clientUrl + path;
