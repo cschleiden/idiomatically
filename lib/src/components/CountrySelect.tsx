@@ -5,7 +5,8 @@ import {
   GetCountriesQuery,
   GetCountriesQueryVariables
 } from "../__generated__/types";
-import { useQuery } from "@apollo/react-hooks";
+import { useLazyQuery } from "@apollo/react-hooks";
+import { useState, useEffect } from "react";
 const { Option } = Select;
 
 export const getCountriesQuery = gql`
@@ -26,15 +27,26 @@ export interface CountrySelectProps {
   ) => void;
 }
 
-export const CountrySelect: React.StatelessComponent<CountrySelectProps> = React.forwardRef<
-  {},
-  CountrySelectProps
->((props, ref) => {
-  const { data, loading } = useQuery<
+export const CountrySelect: React.StatelessComponent<CountrySelectProps> = (props) => {
+
+  const [lastLanguageKey, setLastLanguageKey] = useState<(string | undefined)>(props.languageKey);
+  const [getCountries, getCountriesLoadResult] = useLazyQuery<
     GetCountriesQuery,
     GetCountriesQueryVariables
-  >(getCountriesQuery, { variables: { languageKey: props.languageKey } });
+  >(getCountriesQuery);
 
+  useEffect(() => {
+    setLastLanguageKey(props.languageKey);
+  }, [props.languageKey]);
+
+  const called = getCountriesLoadResult && getCountriesLoadResult.called;
+  const data = getCountriesLoadResult && getCountriesLoadResult.data;
+  const loading = getCountriesLoadResult && getCountriesLoadResult.loading;
+  if ((!called
+    && !loading)
+    || (props.languageKey && lastLanguageKey !== props.languageKey)) {
+    getCountries({ variables: { languageKey: props.languageKey } });
+  }
   const options = data ? buildOptions(data!) : undefined;
   return (
     <Select
@@ -53,7 +65,7 @@ export const CountrySelect: React.StatelessComponent<CountrySelectProps> = React
       {options}
     </Select>
   );
-});
+};
 function buildOptions(data: GetCountriesQuery) {
   return data.countries.map(c => {
     const key = c.countryKey;

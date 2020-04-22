@@ -9,12 +9,8 @@ import {
 } from "../__generated__/types";
 import gql from "graphql-tag";
 import "./NewIdiom.scss";
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { Typography, Alert, Spin } from "antd";
-import { WrappedFormInternalProps } from "@ant-design/compatible/lib/form/Form";
-import { IDictionary } from "../types";
-import { FormEvent, useState } from "react";
+import { Typography, Alert, Spin, Form } from "antd";
+import { useState } from "react";
 import { Redirect } from "react-router";
 import { FULL_IDIOM_ENTRY } from "../fragments/fragments";
 import { getIdiomQuery } from "../fragments/getIdiom";
@@ -25,6 +21,7 @@ import { useCurrentUser } from "../components/withCurrentUser";
 import { useMutation, useLazyQuery } from "@apollo/react-hooks";
 import { PendingOperationNotification } from "../components/PendingOperationNotification";
 import { IdiomRenderer } from "../components/IdiomRenderer";
+import { Store } from "antd/lib/form/interface";
 const { Title, Paragraph } = Typography;
 
 export const createIdiomQuery = gql`
@@ -62,8 +59,6 @@ export interface NewIdiomProps {
   equivalentIdiomId?: string;
 }
 
-type FormProps = NewIdiomProps & WrappedFormInternalProps<IDictionary<string | string[]>>;
-
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
@@ -75,9 +70,8 @@ const formItemLayout = {
   }
 };
 
-const NewIdiomComponent: React.StatelessComponent<FormProps> = props => {
+export const NewIdiom: React.StatelessComponent<NewIdiomProps> = props => {
   const { currentUser, currentUserLoading } = useCurrentUser();
-  const { getFieldDecorator } = props.form;
 
   const [languageKey, setLanguageKey] = useState("");
 
@@ -86,30 +80,32 @@ const NewIdiomComponent: React.StatelessComponent<FormProps> = props => {
   );
   const [getEquivalentIdiom, equivalentLoadInfo] = useLazyQuery<GetIdiomQuery, GetIdiomQueryVariables>(getIdiomQuery);
 
-  const handleSubmit = async (
-    e: FormEvent<any>,
-    props: FormProps,
+  const [form] = Form.useForm();
+  const onFinishFailed = async (
+    values: Store
+  ) => {
+    const { errorFields } = values;
+    form.scrollToField(errorFields[0].name);
+  };
+
+  const onFinish = async (
+    values: Store,
     createIdiom: MutationFunction<CreateIdiomMutation, CreateIdiomMutationVariables>,
     equivalentIdiom: FullIdiomEntry | null
   ) => {
-    e.preventDefault();
-    props.form.validateFieldsAndScroll(async (err, values) => {
-      if (!err) {
-        console.log("Received values of form: ", values);
+    console.log("Received values of form: ", values);
 
-        const variables: CreateIdiomMutationVariables = {
-          title: values["title"] as string,
-          description: values["description"] as string,
-          transliteration: values["transliteration"] as string,
-          literalTranslation: values["literalTranslation"] as string,
-          languageKey: values["languageKey"] as string,
-          countryKeys: values["countryKeys"] as string[],
-          relatedIdiomId: equivalentIdiom && equivalentIdiom.id
-        };
+    const variables: CreateIdiomMutationVariables = {
+      title: values["title"] as string,
+      description: values["description"] as string,
+      transliteration: values["transliteration"] as string,
+      literalTranslation: values["literalTranslation"] as string,
+      languageKey: values["languageKey"] as string,
+      countryKeys: values["countryKeys"] as string[],
+      relatedIdiomId: equivalentIdiom && equivalentIdiom.id
+    };
 
-        await createIdiom({ variables, errorPolicy: "all" } as any);
-      }
-    });
+    await createIdiom({ variables, errorPolicy: "all" } as any);
   };
 
   const userNoLongerSignedIn = isAuthenticationError(error);
@@ -130,7 +126,7 @@ const NewIdiomComponent: React.StatelessComponent<FormProps> = props => {
       fragment: FULL_IDIOM_ENTRY
     });
   }
-  const form = () => (
+  const renderForm =  (
     <div>
       <Title level={2}>Add an Idiom</Title>
       <Paragraph>
@@ -149,7 +145,16 @@ const NewIdiomComponent: React.StatelessComponent<FormProps> = props => {
 
       {(loading || currentUserLoading) && <Spin className="middleSpinner" delay={500} spinning tip="Loading..." />}
       {error && <Alert type="error" message={getErrorMessage(error)} showIcon />}
-      <Form labelAlign="left" {...formItemLayout} onSubmit={e => handleSubmit(e, props, createIdiom, equivilentIdiom)}>
+      <Form
+        form={form}
+        initialValues={
+          {
+            languageKey: languageKey
+          }
+        }
+        labelAlign="left" {...formItemLayout}
+        onFinishFailed={onFinishFailed}
+        onFinish={store => onFinish(store, createIdiom, equivilentIdiom)}>
         {equivilentIdiom && (
           <Form.Item label="Add an equivalent idiom for" colon>
             <div className="equivalentEntry">
@@ -158,7 +163,7 @@ const NewIdiomComponent: React.StatelessComponent<FormProps> = props => {
           </Form.Item>
         )}
 
-        {commonFormItems(getFieldDecorator, loading, setLanguageKey, languageKey)}
+        {commonFormItems(loading, setLanguageKey, languageKey)}
       </Form>
     </div>
   );
@@ -179,10 +184,8 @@ const NewIdiomComponent: React.StatelessComponent<FormProps> = props => {
       return <Alert message="Oops!" description="It looks like you went barking up the wrong tree." type="warning" showIcon />;
     }
     equivilentIdiom = equivalentLoadInfo.data.idiom;
-    return <>{form()}</>;
+    return <>{renderForm}</>;
   } else {
-    return form();
+    return renderForm;
   }
 };
-
-export const NewIdiom = Form.create<FormProps>({ name: "newIdiom" })(NewIdiomComponent);

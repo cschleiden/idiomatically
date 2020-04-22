@@ -1,9 +1,6 @@
 import { FullIdiomEntry } from "../__generated__/types";
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { Input, Tooltip, Button } from "antd";
+import { Input, Tooltip, Button, Form } from "antd";
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { GetFieldDecoratorOptions } from "@ant-design/compatible/lib/form/Form";
 import TextArea from "antd/lib/input/TextArea";
 import { LanguageSelect } from "./LanguageSelect";
 import { CountrySelect } from "./CountrySelect";
@@ -23,7 +20,6 @@ export const tailFormItemLayout = {
 };
 
 export function commonFormItems(
-  getFieldDecorator: (id: string, options?: GetFieldDecoratorOptions) => (node: React.ReactNode) => React.ReactNode,
   actionInProgress?: boolean,
   setLanguageKey?: React.Dispatch<React.SetStateAction<string>>,
   languageKey?: string,
@@ -39,6 +35,15 @@ export function commonFormItems(
   return (
     <>
       <Form.Item
+        name="title"
+        rules={[
+          {
+            required: true,
+            message: "An Idiom is required",
+            whitespace: true,
+            max: 1000
+          }
+        ]}
         label={
           <span>
             Idiom (In the langauges own alphabet) &nbsp;
@@ -48,46 +53,43 @@ export function commonFormItems(
           </span>
         }
       >
-        {getFieldDecorator("title", {
-          initialValue: existingValues.title,
-          rules: [
+        <Input autoComplete="off" />
+      </Form.Item>
+      <Form.Item
+        name="languageKey"
+        rules={isCreate &&
+          setLanguageKey ?
+          [
             {
               required: true,
-              message: "An Idiom is required",
-              whitespace: true,
-              max: 1000
+              message: "Unknown language",
+              whitespace: true
             }
-          ]
-        })(<Input autoComplete="off" />)}
-      </Form.Item>
-
-      {
-        <Form.Item
-          label={
-            <span>
-              Language&nbsp;
+          ] : []}
+        label={
+          <span>
+            Language&nbsp;
               <Tooltip title="The language of the idiom">
-                <QuestionCircleOutlined />
-              </Tooltip>
-            </span>
-          }
-        >
-          {isCreate &&
-            setLanguageKey &&
-            getFieldDecorator("languageKey", {
-              initialValue: languageKey,
-              rules: [
-                {
-                  required: true,
-                  message: "Unknown language",
-                  whitespace: true
-                }
-              ]
-            })(<LanguageSelect onChange={lk => setLanguageKey(lk)} />)}
-          {!isCreate && <span className="ant-form-text">{existingValues!.language!.languageName}</span>}
-        </Form.Item>
-      }
+              <QuestionCircleOutlined />
+            </Tooltip>
+          </span>
+        }
+      >
+        <LanguageSelect
+          readOnly={!isCreate}
+          readOnlyText={existingValues && existingValues.language && existingValues.language.languageName}
+          onChange={lk => setLanguageKey && setLanguageKey(lk)} />
+      </Form.Item>
       <Form.Item
+        name="countryKeys"
+        rules={[
+          {
+            required: true,
+            message: "Unknown country",
+            whitespace: true,
+            type: "array"
+          }
+        ]}
         label={
           <span>
             Country&nbsp;
@@ -97,21 +99,20 @@ export function commonFormItems(
           </span>
         }
       >
-        {getFieldDecorator("countryKeys", {
-          initialValue: existingCountries,
-          rules: [
-            {
-              required: true,
-              message: "Unknown country",
-              whitespace: true,
-              type: "array"
-            }
-          ]
-        })(<CountrySelect initialValue={existingCountries} languageKey={languageKey} />)}
+        <CountrySelect initialValue={existingCountries} languageKey={languageKey} />
       </Form.Item>
 
       {!isEnglish && (
         <Form.Item
+          name="literalTranslation"
+          rules={[
+            {
+              message: "The literal translation is required",
+              whitespace: true,
+              max: 1000,
+              required: true
+            }
+          ]}
           label={
             <span>
               Literal Translation (In English)&nbsp;
@@ -121,21 +122,19 @@ export function commonFormItems(
             </span>
           }
         >
-          {getFieldDecorator("literalTranslation", {
-            initialValue: existingValues.literalTranslation,
-            rules: [
-              {
-                message: "The literal translation is required",
-                whitespace: true,
-                max: 1000,
-                required: true
-              }
-            ]
-          })(<Input autoComplete="off" />)}
+          <Input autoComplete="off" />
         </Form.Item>
       )}
 
       <Form.Item
+        name="description"
+        rules={[
+          {
+            message: "Please enter a valid description",
+            whitespace: true,
+            max: 10000
+          }
+        ]}
         label={
           <span>
             Description&nbsp;
@@ -145,20 +144,19 @@ export function commonFormItems(
           </span>
         }
       >
-        {getFieldDecorator("description", {
-          initialValue: existingValues.description,
-          rules: [
-            {
-              message: "Please enter a valid description",
-              whitespace: true,
-              max: 10000
-            }
-          ]
-        })(<TextArea rows={15} />)}
+        <TextArea rows={15} />
       </Form.Item>
 
       {!isEnglish && !isCreate && (
         <Form.Item
+          name="transliteration"
+          rules={[
+            {
+              message: "The transliteration is too long",
+              whitespace: true,
+              max: 1000
+            }
+          ]}
           label={
             <span>
               Transliteration (How to pronounce it with English characters)&nbsp;
@@ -168,16 +166,7 @@ export function commonFormItems(
             </span>
           }
         >
-          {getFieldDecorator("transliteration", {
-            initialValue: existingValues.transliteration,
-            rules: [
-              {
-                message: "The transliteration is too long",
-                whitespace: true,
-                max: 1000
-              }
-            ]
-          })(<Input />)}
+          <Input />
         </Form.Item>
       )}
 

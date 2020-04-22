@@ -2,7 +2,7 @@ import * as React from "react";
 import { Select } from "antd";
 import gql from "graphql-tag";
 import { GetLanguagesQuery } from "../__generated__/types";
-import { useQuery } from "@apollo/react-hooks";
+import { useLazyQuery } from "@apollo/react-hooks";
 const { Option } = Select;
 
 export const getLanguagesQuery = gql`
@@ -19,15 +19,31 @@ export interface LanguageSelectProps {
   onChange?: (
     value: string
   ) => void;
+
+  readOnly?: boolean;
+
+  readOnlyText?: string;
 }
 
-export const LanguageSelect: React.StatelessComponent<LanguageSelectProps> = 
-React.forwardRef<{},LanguageSelectProps>((props, ref) => {
-  const { data, loading } = useQuery<GetLanguagesQuery>(
+export const LanguageSelect: React.StatelessComponent<LanguageSelectProps> = (props) => {
+  const [getLanguages, getLanguagesLoadResult] = useLazyQuery<GetLanguagesQuery>(
     getLanguagesQuery
   );
 
+  const called = getLanguagesLoadResult && getLanguagesLoadResult.called;
+  const data = getLanguagesLoadResult && getLanguagesLoadResult.data;
+  const loading = getLanguagesLoadResult && getLanguagesLoadResult.loading;
+  if ((!called
+    && !loading)) {
+    getLanguages();
+  }
+
+
   const options = data ? buildOptions(data!) : undefined;
+  if (props.readOnly) {
+    return <span className="ant-form-text">{props.readOnlyText}</span>;
+  }
+
   return (
     <Select
       loading={loading}
@@ -42,7 +58,7 @@ React.forwardRef<{},LanguageSelectProps>((props, ref) => {
       {options}
     </Select>
   );
-});
+};
 function buildOptions(data: GetLanguagesQuery) {
   return data.languages.map(lang => {
     const key = lang.languageKey;

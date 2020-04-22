@@ -8,12 +8,7 @@ import {
 } from "../__generated__/types";
 import gql from "graphql-tag";
 import "./NewIdiom.scss";
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { Typography, Alert, Spin } from "antd";
-import { WrappedFormInternalProps } from "@ant-design/compatible/lib/form/Form";
-import { IDictionary } from "../types";
-import { FormEvent } from "react";
+import { Typography, Alert, Spin, Form } from "antd";
 import { Redirect } from "react-router";
 import { FULL_IDIOM_ENTRY } from "../fragments/fragments";
 import { getIdiomQuery } from "../fragments/getIdiom";
@@ -23,6 +18,7 @@ import { MutationFunction } from "@apollo/react-common";
 import { useCurrentUser } from "../components/withCurrentUser";
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import { PendingOperationNotification } from "../components/PendingOperationNotification";
+import { Store } from "antd/lib/form/interface";
 const { Title } = Typography;
 
 export const updateIdiomQuery = gql`
@@ -58,8 +54,6 @@ export interface UpdateIdiomProps {
   slug: string;
 }
 
-type FormProps = UpdateIdiomProps & WrappedFormInternalProps<IDictionary<string | string[]>>;
-
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
@@ -71,10 +65,8 @@ const formItemLayout = {
   }
 };
 
-const UpdateIdiomComponent: React.StatelessComponent<FormProps> = props => {
+export const UpdateIdiom: React.StatelessComponent<UpdateIdiomProps> = props => {
   const { currentUser, currentUserLoading } = useCurrentUser();
-  const { getFieldDecorator } = props.form;
-
   const [updateIdiom, { data, error, loading }] = useMutation<UpdateIdiomMutation, UpdateIdiomMutationVariables>(
     updateIdiomQuery
   );
@@ -82,29 +74,32 @@ const UpdateIdiomComponent: React.StatelessComponent<FormProps> = props => {
     variables: { slug: props.slug }
   });
 
-  const handleSubmit = async (
-    e: FormEvent<any>,
-    props: FormProps,
+  const [form] = Form.useForm();
+  const onFinishFailed = async (
+    values: Store
+  ) => {
+    const { errorFields } = values;
+    form.scrollToField(errorFields[0].name);
+  };
+
+  const onFinish = async (
+    values: Store,
     updateIdiom: MutationFunction<UpdateIdiomMutation, UpdateIdiomMutationVariables>,
     idiomId: string
   ) => {
-    e.preventDefault();
-    props.form.validateFieldsAndScroll(async (err, values) => {
-      if (!err) {
-        console.log("Received values of form: ", values);
 
-        const variables: UpdateIdiomMutationVariables = {
-          id: idiomId,
-          title: values["title"] as string,
-          description: values["description"] as string,
-          transliteration: values["transliteration"] as string,
-          literalTranslation: values["literalTranslation"] as string,
-          countryKeys: values["countryKeys"] as string[]
-        };
+    console.log("Received values of form: ", values);
 
-        await updateIdiom({ variables, errorPolicy: "all" } as any);
-      }
-    });
+    const variables: UpdateIdiomMutationVariables = {
+      id: idiomId,
+      title: values["title"] as string,
+      description: values["description"] as string,
+      transliteration: values["transliteration"] as string,
+      literalTranslation: values["literalTranslation"] as string,
+      countryKeys: values["countryKeys"] as string[]
+    };
+
+    await updateIdiom({ variables, errorPolicy: "all" } as any);
   };
 
   const userNoLongerSignedIn = isAuthenticationError(error);
@@ -144,14 +139,22 @@ const UpdateIdiomComponent: React.StatelessComponent<FormProps> = props => {
       {(loading || currentUserLoading) && <Spin className="middleSpinner" delay={500} spinning tip="Loading..." />}
       {error && <Alert type="error" message={getErrorMessage(error)} showIcon />}
       <Form
+        name="updateIdiom"
+        initialValues={{
+          title: idiomLoadInfo.data.idiom.title,
+          languageKey: idiomLoadInfo.data.idiom.language && idiomLoadInfo.data.idiom.language.languageKey,
+          countryKeys: idiomLoadInfo.data.idiom.language && idiomLoadInfo.data.idiom.language.countries.map(x => x.countryKey),
+          literalTranslation: idiomLoadInfo.data.idiom.literalTranslation,
+          description: idiomLoadInfo.data.idiom.description
+        }
+        }
         labelAlign="left"
         {...formItemLayout}
-        onSubmit={e => handleSubmit(e, props, updateIdiom, idiomLoadInfo.data!.idiom!.id)}
+        onFinishFailed={onFinishFailed}
+        onFinish={store => onFinish(store, updateIdiom, idiomLoadInfo.data!.idiom!.id)}
       >
-        {commonFormItems(getFieldDecorator, loading, undefined, undefined, idiomLoadInfo.data.idiom)}
+        {commonFormItems(loading, undefined, undefined, idiomLoadInfo.data.idiom)}
       </Form>
     </div>
   );
 };
-
-export const UpdateIdiom = Form.create<FormProps>({ name: "updateIdiom" })(UpdateIdiomComponent);
