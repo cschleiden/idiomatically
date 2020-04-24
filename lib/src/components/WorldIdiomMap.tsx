@@ -7,7 +7,8 @@ import {
     Geographies,
     Geography
 } from "react-simple-maps";
-import { GetIdiomQuery_idiom, GetIdiomQuery_idiom_equivalents } from "../__generated__/types";
+import { GetIdiomQuery_idiom, GetIdiomQuery_idiom_equivalents, GetIdiomQuery_idiom_equivalents_language_countries, GetIdiomQuery_idiom_language_countries } from "../__generated__/types";
+import { CountryFlag } from "./CountryFlag";
 
 const geoUrl = `${process.env.REACT_APP_SERVER}/world-110m.json`;
 
@@ -22,7 +23,8 @@ export interface WorldIdiomMapProps {
 type IdiomMapInfo = {
     title: string,
     literalTranslation: string | null,
-    languageName: string
+    languageName: string,
+    country: GetIdiomQuery_idiom_equivalents_language_countries | GetIdiomQuery_idiom_language_countries
 }
 
 const MapChartInternal: React.StatelessComponent<MapChartProps> = (props) => {
@@ -101,11 +103,12 @@ const WorldMap: React.StatelessComponent<WorldIdiomMapProps> = (props) => {
     let toolTipContent: JSX.Element | null = null;
     if (selectedCountry) {
         const idioms = idiomMap.get(selectedCountry?.countryKey);
+        const country = idioms ? idioms[0].country : null;
         const idiomHtml = idioms?.map(x =>
             <><div className="mapIdiomTitle">{x.title}</div>
                 <div className="mapIdiomTranslation">{x.literalTranslation}</div></>)
         toolTipContent = <div>
-            <h2>{selectedCountry.countryName}</h2>
+            <h2><CountryFlag country={country!} size={"small"} />{selectedCountry.countryName}</h2>
             {idiomHtml}
         </div>;
     }
@@ -123,7 +126,8 @@ function ProcessIdiom(idiomMap: Map<string, IdiomMapInfo[]>, idiom: (GetIdiomQue
         const info: IdiomMapInfo = {
             title: idiom.title,
             literalTranslation: idiom.literalTranslation,
-            languageName: idiom.language.languageName
+            languageName: idiom.language.languageName,
+            country: country
         };
         existing.push(info);
         idiomMap.set(country.countryKey, existing);

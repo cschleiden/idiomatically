@@ -21,6 +21,8 @@ import { AddEquivalentSection } from "../components/AddEquivalentSection";
 import { EquivalentIdiomList } from "../components/EquivalentIdiomList";
 import { DeleteFilled } from '@ant-design/icons';
 import { Typography, Alert, Spin, Button, PageHeader, Tabs } from "antd";
+import screenfull from 'screenfull';
+import Fullscreen from "react-full-screen";
 const WorldMap = React.lazy(() => import('../components/WorldIdiomMap'));
 const { TabPane } = Tabs;
 const { Title, Paragraph } = Typography;
@@ -44,9 +46,11 @@ export interface IdiomProps {
 }
 type IdiomCombinedProps = RouteChildrenProps<any> & IdiomProps;
 
+
 export const Idiom: React.StatelessComponent<IdiomCombinedProps> = props => {
   const { slug } = props;
-
+  const [equivalentTab, setEquivalentTab] = useState<string>("List");
+  const [isMapFullscreen, setMapFullscreen] = useState(false);
   const { currentUser, currentUserLoading } = useCurrentUser();
   const [deleteConfirmation, setDeleteConfirmation] = useState(DeleteActionState.None);
   const showEdit = currentUser && !currentUserLoading;
@@ -98,6 +102,16 @@ export const Idiom: React.StatelessComponent<IdiomCombinedProps> = props => {
       props.history.push("/idioms/" + idiom.slug + "/update");
     }
   };
+  const onFullScreenClick: React.MouseEventHandler<HTMLElement> = (e) => {
+    if (screenfull.isEnabled && equivalentTab === "Map") {
+      setMapFullscreen(true);
+    }
+  }
+
+  const fullScreenMapButton = screenfull.isEnabled && equivalentTab === "Map" ? <Button onClick={onFullScreenClick}>View Fullscreen</Button> : null;
+  const onTabChange = (key: string): void => {
+    return setEquivalentTab(key);
+  }
   return (
     <article className="idiom">
       <PageHeader
@@ -135,13 +149,18 @@ export const Idiom: React.StatelessComponent<IdiomCombinedProps> = props => {
 
         <Title level={4}>Equivalents</Title>
         <Paragraph className="info">This is how you express this idiom across languages and locales.</Paragraph>
-        <Tabs animated={false}>
-          <TabPane tab="List" key="1">
+        <Tabs animated={false} tabBarExtraContent={fullScreenMapButton} onChange={onTabChange}>
+          <TabPane key="List" tab="List">
             <EquivalentIdiomList idiom={idiom} user={currentUser} />
           </TabPane>
-          <TabPane tab="Map" key="2" className="worldMapPanel">
+          <TabPane key="Map" tab="Map" className="worldMapPanel">
             <Suspense fallback={<Spin delay={150} className="middleSpinner" tip="Loading..." />}>
-              <WorldMap idiom={idiom} />
+              <Fullscreen
+                enabled={isMapFullscreen}
+                onChange={isFull => setMapFullscreen(isFull)}
+              >
+                <WorldMap idiom={idiom} />
+              </Fullscreen>
             </Suspense>
           </TabPane>
         </Tabs>

@@ -1,14 +1,9 @@
 import * as React from "react";
-import { parse as emoji } from "twemoji-parser";
-import { Tooltip, Avatar } from "antd";
+import { Tooltip } from "antd";
 import "./LanguageFlags.scss";
 import { FullIdiomEntry_language, FullIdiomEntry_language_countries } from "../__generated__/types";
+import { CountryFlag, FlagSize } from "./CountryFlag";
 
-type FlagSize = "small" | "default" | "large";
-export interface FlagCountry {
-  name: string;
-  flag: string;
-}
 export interface LanguageFlagsProps {
   languageInfo: FullIdiomEntry_language;
   /**
@@ -43,7 +38,7 @@ const renderFlag = (countries: FullIdiomEntry_language_countries[], size?: FlagS
     const country = countries[0];
     return (
       <div className="flagsGroup">
-        {getCountryFlag(country, size)}
+        <CountryFlag country={country} size={size} />
         {countries.length > 1 && (
           <Tooltip
             className="flagOverflow"
@@ -62,16 +57,5 @@ const renderFlag = (countries: FullIdiomEntry_language_countries[], size?: FlagS
 };
 
 const renderFlagList = (countries: FullIdiomEntry_language_countries[], size?: FlagSize) => (
-  <div className="flagList">{countries.map(f => getCountryFlag(f, size))}</div>
+  <div className="flagList">{countries.map(f => <CountryFlag country={f} size={size} />)}</div>
 );
-
-const getCountryFlag = (country: FullIdiomEntry_language_countries, size?: FlagSize) => {
-  const emojiResults = emoji(country.emojiFlag);
-  const flagEmoji = emojiResults ? emojiResults[0].url : undefined;
-
-  return (
-    <Tooltip className="flagImage" placement="top" title={country.countryName} key={country.countryKey} arrowPointAtCenter>
-      <Avatar src={flagEmoji} size={size} />
-    </Tooltip>
-  );
-};
