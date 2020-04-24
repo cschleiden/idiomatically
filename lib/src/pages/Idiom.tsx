@@ -21,6 +21,7 @@ import { AddEquivalentSection } from "../components/AddEquivalentSection";
 import { EquivalentIdiomList } from "../components/EquivalentIdiomList";
 import { DeleteFilled } from '@ant-design/icons';
 import { Typography, Alert, Spin, Button, PageHeader } from "antd";
+import { WorldMap } from "../components/WorldIdiomMap";
 const { Title, Paragraph } = Typography;
 
 export const deleteIdiomQuery = gql`
@@ -135,6 +136,8 @@ export const Idiom: React.StatelessComponent<IdiomCombinedProps> = props => {
         <Paragraph className="info">This is how you express this idiom across languages and locales.</Paragraph>
         <EquivalentIdiomList idiom={idiom} user={currentUser} />
         <AddEquivalentSection idiom={idiom} user={currentUser} history={props.history} />
+
+        <WorldMap idiom={idiom} />
       </PageHeader>
     </article>
   );
