@@ -81,4 +81,8 @@ article.idiom {
       border-color: red;
     }
   }
+
+  .ant-tabs-tabpane-active.worldMapPanel {
+    min-height: 550px;
+  }
 }

@@ -14,14 +14,15 @@ import {
 import { useCurrentUser } from "../components/withCurrentUser";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import marked from "marked";
 import dompurifyFactory from "dompurify";
 import { AddEquivalentSection } from "../components/AddEquivalentSection";
 import { EquivalentIdiomList } from "../components/EquivalentIdiomList";
 import { DeleteFilled } from '@ant-design/icons';
-import { Typography, Alert, Spin, Button, PageHeader } from "antd";
-import { WorldMap } from "../components/WorldIdiomMap";
+import { Typography, Alert, Spin, Button, PageHeader, Tabs } from "antd";
+const WorldMap = React.lazy(() => import('../components/WorldIdiomMap'));
+const { TabPane } = Tabs;
 const { Title, Paragraph } = Typography;
 
 export const deleteIdiomQuery = gql`
@@ -134,11 +135,19 @@ export const Idiom: React.StatelessComponent<IdiomCombinedProps> = props => {
 
         <Title level={4}>Equivalents</Title>
         <Paragraph className="info">This is how you express this idiom across languages and locales.</Paragraph>
-        <EquivalentIdiomList idiom={idiom} user={currentUser} />
+        <Tabs animated={false}>
+          <TabPane tab="List" key="1">
+            <EquivalentIdiomList idiom={idiom} user={currentUser} />
+          </TabPane>
+          <TabPane tab="Map" key="2" className="worldMapPanel">
+            <Suspense fallback={<Spin delay={150} className="middleSpinner" tip="Loading..." />}>
+              <WorldMap idiom={idiom} />
+            </Suspense>
+          </TabPane>
+        </Tabs>
         <AddEquivalentSection idiom={idiom} user={currentUser} history={props.history} />
-
-        <WorldMap idiom={idiom} />
       </PageHeader>
     </article>
+
   );
 };

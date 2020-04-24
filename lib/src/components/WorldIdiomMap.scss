@@ -1,0 +1,26 @@
+@import "./App.scss";
+
+.__react_component_tooltip {
+  h2 {
+    color: white !important;
+    margin-bottom: 0px !important;
+  }
+
+  .mapIdiomTitle {
+    font-size: 0.85rem;
+
+    &:first-letter {
+      text-transform: capitalize;
+    }
+  }
+
+  .mapIdiomTranslation {
+    font-size: 0.6rem;
+    margin-top: -3px;
+    margin-bottom: 3px;
+    text-indent: 8px;
+    &:first-letter {
+      text-transform: capitalize;
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import React, { memo, useState } from "react";
+import "./WorldIdiomMap.scss";
 import ReactTooltip from "react-tooltip";
 import {
     ZoomableGroup,
@@ -8,8 +9,7 @@ import {
 } from "react-simple-maps";
 import { GetIdiomQuery_idiom, GetIdiomQuery_idiom_equivalents } from "../__generated__/types";
 
-const geoUrl =
-    "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
+const geoUrl = `${process.env.REACT_APP_SERVER}/world-110m.json`;
 
 interface MapChartProps extends WorldIdiomMapProps {
     setSelectedCountry: (tooltip: (SelectedCountry | null)) => void;
@@ -84,7 +84,7 @@ type SelectedCountry = {
 }
 
 const idiomMap: Map<string, IdiomMapInfo[]> = new Map();
-export const WorldMap: React.StatelessComponent<WorldIdiomMapProps> = (props) => {
+const WorldMap: React.StatelessComponent<WorldIdiomMapProps> = (props) => {
     const [selectedCountry, setSelectedCountry] = useState<SelectedCountry | null>(null);
     const newProps = { setSelectedCountry: setSelectedCountry, ...props };
 
@@ -130,3 +130,4 @@ function ProcessIdiom(idiomMap: Map<string, IdiomMapInfo[]>, idiom: (GetIdiomQue
     }
 }
 
+export default WorldMap;
