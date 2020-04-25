@@ -57,5 +57,5 @@ const renderFlag = (countries: FullIdiomEntry_language_countries[], size?: FlagS
 };
 
 const renderFlagList = (countries: FullIdiomEntry_language_countries[], size?: FlagSize) => (
-  <div className="flagList">{countries.map(f => <CountryFlag country={f} size={size} />)}</div>
+  <div className="flagList">{countries.map(f => <CountryFlag key={f.countryKey} country={f} size={size} />)}</div>
 );

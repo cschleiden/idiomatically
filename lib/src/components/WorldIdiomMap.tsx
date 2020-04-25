@@ -21,6 +21,7 @@ export interface WorldIdiomMapProps {
 }
 
 type IdiomMapInfo = {
+    slug: string,
     title: string,
     literalTranslation: string | null,
     languageName: string,
@@ -59,14 +60,14 @@ const MapChartInternal: React.StatelessComponent<MapChartProps> = (props) => {
                                     style={{
                                         default: {
                                             fill: hasIdioms ? "#513b56" : "#D6D6DA",
-                                            outline: hasIdioms ? "" : "none"
+                                            outline: "none"
                                         },
                                         hover: {
-                                            fill: hasIdioms ? "#525174" : "#D6D6DA",
+                                            fill: hasIdioms ? "#354A1B" : "#D6D6DA",
                                             outline: "none"
                                         },
                                         pressed: {
-                                            fill: hasIdioms ? "#525174" : "#D6D6DA",
+                                            fill: hasIdioms ? "#354A1B" : "#D6D6DA",
                                             outline: "none"
                                         }
                                     }}
@@ -107,8 +108,13 @@ const WorldMap: React.StatelessComponent<WorldIdiomMapProps> = (props) => {
         const idioms = idiomMap.get(selectedCountry?.countryKey);
         const country = idioms ? idioms[0].country : null;
         const idiomHtml = idioms?.map(x =>
-            <><div className="mapIdiomTitle">{x.title}</div>
-                <div className="mapIdiomTranslation">{x.literalTranslation}</div></>)
+            <div key={x.slug} className="mapIdiomContainer">
+                <div className="mapIdiomTitleContainer">
+                    <span className="idiomLanguage">{x.languageName}: </span>
+                    <span className="mapIdiomTitle">{x.title}</span>
+                </div>
+                <div className="mapIdiomTranslation">{x.literalTranslation}</div>
+            </div>)
         toolTipContent = <div>
             <h2><CountryFlag country={country!} size={"small"} />{selectedCountry.countryName}</h2>
             {idiomHtml}
@@ -116,7 +122,7 @@ const WorldMap: React.StatelessComponent<WorldIdiomMapProps> = (props) => {
     }
 
     return (
-        <div className="worldIdiomTooltip">
+        <div>
             <MapChart {...newProps} />
             <ReactTooltip className="worldIdiomTooltip">{toolTipContent}</ReactTooltip>
         </div>
@@ -127,6 +133,7 @@ function ProcessIdiom(idiomMap: Map<string, IdiomMapInfo[]>, idiom: (GetIdiomQue
         let existing = idiomMap.get(country.countryKey) || [];
         const info: IdiomMapInfo = {
             title: idiom.title,
+            slug: idiom.slug,
             literalTranslation: idiom.literalTranslation,
             languageName: idiom.language.languageName,
             country: country
