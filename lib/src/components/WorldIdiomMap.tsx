@@ -41,6 +41,8 @@ const MapChartInternal: React.StatelessComponent<MapChartProps> = (props) => {
                                 const idioms = idiomMap.get(ISO_A2);
                                 const hasIdioms = !!idioms;
                                 return <Geography
+                                    stroke="white"
+                                    strokeWidth="0.5px"
                                     key={geo.rsmKey}
                                     geography={geo}
                                     onMouseEnter={() => {
@@ -57,7 +59,7 @@ const MapChartInternal: React.StatelessComponent<MapChartProps> = (props) => {
                                     style={{
                                         default: {
                                             fill: hasIdioms ? "#513b56" : "#D6D6DA",
-                                            outline: "none"
+                                            outline: hasIdioms ? "" : "none"
                                         },
                                         hover: {
                                             fill: hasIdioms ? "#525174" : "#D6D6DA",
