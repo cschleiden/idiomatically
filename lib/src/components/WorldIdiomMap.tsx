@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { useState } from "react";
 import "./WorldIdiomMap.scss";
 import ReactTooltip from "react-tooltip";
 import {
@@ -28,7 +28,7 @@ type IdiomMapInfo = {
     country: GetIdiomQuery_idiom_equivalents_language_countries | GetIdiomQuery_idiom_language_countries
 }
 
-const MapChartInternal: React.StatelessComponent<MapChartProps> = (props) => {
+const MapChart: React.StatelessComponent<MapChartProps> = (props) => {
 
 
     return (
@@ -80,8 +80,6 @@ const MapChartInternal: React.StatelessComponent<MapChartProps> = (props) => {
         </>
     );
 };
-
-const MapChart = memo(MapChartInternal);
 
 type SelectedCountry = {
     countryKey: string,

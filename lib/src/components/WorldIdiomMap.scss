@@ -7,11 +7,12 @@
     color: white !important;
     margin-bottom: 5px !important;
     line-height: 1.3rem !important;
+    font-size: 0.92rem;
   }
 
   .mapIdiomContainer {
     .mapIdiomTitleContainer {
-      line-height: 0.90rem !important;
+      line-height: 0.9rem !important;
 
       .idiomLanguage {
         font-family: monospace;
@@ -19,7 +20,7 @@
       }
 
       .mapIdiomTitle {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
 
         &:first-letter {
           text-transform: capitalize;
@@ -28,10 +29,10 @@
     }
 
     .mapIdiomTranslation {
-      font-size: 0.6rem;
+      font-size: 0.7rem;
       margin-top: 0px;
       margin-bottom: 3px;
-      text-indent: 8px;
+      margin-left: 8px;
       &:first-letter {
         text-transform: capitalize;
       }
@@ -40,6 +41,6 @@
 
   .flagImage {
     margin-right: 5px;
-    vertical-align: text-bottom;
+    vertical-align: bottom;
   }
 }
