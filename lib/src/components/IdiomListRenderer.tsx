@@ -34,6 +34,7 @@ export const IdiomListRenderer: React.StatelessComponent<IdiomListRendererProps>
         pageSize: props.pageSize,
         hideOnSinglePage: true,
         total: props.totalCount,
+        showSizeChanger: false,
         size: props.paginationSize || "default"
       }}
       dataSource={props.idioms}
