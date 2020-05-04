@@ -19,7 +19,7 @@ export default {
             // 2. If you order in certain ways, new items can appear in the middle of paging 
             // Ideally, we should order by date and use that as page but that then means
             // that we have to always prioritize oldest idiom first, which is also unfortunate.
-            
+
             const nextEndPosition = response.skip + response.count;
             const hasNextPage = nextEndPosition < response.totalCount;
             let pageInfo: PageInfo = {
@@ -74,6 +74,9 @@ export default {
 
         removeEquivalent: async (parent, args: MutationRemoveEquivalentArgs, context: GlobalContext, info) => {
             return await context.dataProviders.idiom.removeIdiomEquivalent(context.currentUser, args.idiomId, args.equivalentId);
+        },
+        computeEquivalentClosure: async (parent, args, context: GlobalContext, info) => {
+            return await context.dataProviders.idiom.computeEquivalentClosure();
         }
 
     } as MutationResolvers

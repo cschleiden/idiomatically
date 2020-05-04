@@ -43,7 +43,7 @@ const MapChart: React.StatelessComponent<MapChartProps> = (props) => {
                                 const hasIdioms = !!idioms;
                                 return <Geography
                                     stroke="white"
-                                    strokeWidth="0.5px"
+                                    strokeWidth="0.8px"
                                     key={geo.rsmKey}
                                     geography={geo}
                                     onMouseEnter={() => {

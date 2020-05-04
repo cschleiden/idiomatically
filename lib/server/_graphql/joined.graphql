@@ -53,6 +53,7 @@ type Mutation {
   deleteIdiom(idiomId: ID!): IdiomOperationResult! @auth(requires: ADMIN)
   addEquivalent(idiomId: ID!, equivalentId: ID!): IdiomOperationResult! @auth(requires: GENERAL)
   removeEquivalent(idiomId: ID!, equivalentId: ID!): IdiomOperationResult! @auth(requires: ADMIN)
+  computeEquivalentClosure: IdiomOperationResult! @auth(requires: ADMIN)
   acceptIdiomChangeProposal(proposalId: ID!, body: String): IdiomOperationResult! @auth(requires: ADMIN)
   rejectIdiomChangeProposal(proposalId: ID!): IdiomOperationResult! @auth(requires: ADMIN)
 }

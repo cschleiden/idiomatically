@@ -48,6 +48,12 @@ export interface DbEquivalent {
     createdById?: ObjectID,
 }
 
+export interface DbEquivalentClosureStatus {
+    _id?: ObjectID,
+    lastRunDate?: Date,
+    message?: string
+}
+
 export interface DbIdiom {
     _id?: ObjectID,
     slug: string,

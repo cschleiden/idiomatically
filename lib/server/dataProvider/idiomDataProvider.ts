@@ -2,7 +2,7 @@ import { Db, Collection, ObjectID, FilterQuery } from 'mongodb'
 import { Idiom, IdiomCreateInput, IdiomUpdateInput, QueryIdiomsArgs, IdiomOperationResult, OperationStatus, QueryIdiomArgs } from '../_graphql/types';
 import { Languages, LanguageModel } from './languages'
 import { UserModel, IdiomExpandOptions } from '../model/types';
-import { DbIdiom, mapDbIdiom, DbIdiomChangeProposal, IdiomProposalType, Paged, DbEquivalent, EquivalentSource } from './mapping';
+import { DbIdiom, mapDbIdiom, DbIdiomChangeProposal, IdiomProposalType, Paged, DbEquivalent, EquivalentSource, DbEquivalentClosureStatus } from './mapping';
 import { transliterate, slugify } from 'transliteration';
 import { escapeRegex } from './utils';
 import { UserDataProvider } from './userDataProvider';
@@ -14,6 +14,7 @@ export class IdiomDataProvider {
 
     private changeProposalCollection: Collection<DbIdiomChangeProposal>;
     private idiomCollection: Collection<DbIdiom>;
+    private closureStatusCollection: Collection<DbEquivalentClosureStatus>;
 
     private activeIdiomFilter: FilterQuery<DbIdiom> = { isDeleted: { $ne: true } };
 
@@ -21,6 +22,7 @@ export class IdiomDataProvider {
         this.changeProposalCollection = mongodb.collection(collectionPrefix + 'idiomChangeProposal');
 
         this.idiomCollection = mongodb.collection(collectionPrefix + 'idiom');
+        this.closureStatusCollection = mongodb.collection(collectionPrefix + 'closureStatus');
 
         // Not supported in CosmoDB Mongo facade
         //this.idiomCollection.createIndex({ title: "text" });
@@ -170,6 +172,85 @@ export class IdiomDataProvider {
             const resIdiom = await this.getIdiom(result.insertedId, idiomExpandOptions);
             return this.idiomOperationResult(OperationStatus.Success, resIdiom);
         }
+    }
+
+    async computeEquivalentClosure() {
+
+        let findFilter: FilterQuery<DbIdiom> = null;
+        const closureStatus = await this.closureStatusCollection.findOne({});
+        if (closureStatus && closureStatus.lastRunDate) {
+            findFilter = {
+                $or: [
+                    {
+                        $and: [
+                            { createdAt: { $gt: closureStatus.lastRunDate } },
+                            { updatedAt: null }
+                        ]
+                    },
+                    { updatedAt: { $gt: closureStatus.lastRunDate } }
+                ]
+            }
+        }
+
+        findFilter = this.activeOnly(findFilter);
+
+        const idiomsToClosure = await this.idiomCollection.find(findFilter).toArray();
+
+        let failures = 0;
+        let successes = 0;
+        let deletes = 0;
+        for (const idiom of idiomsToClosure) {
+
+            const equivalents = idiom.equivalents || [];
+            if (equivalents.length <= 0) {
+                continue;
+            }
+
+            if (!equivalents.some(e => e.source === EquivalentSource.Direct)) {
+                // If an idiom has no direct relation it should have all indirects removed.
+                // Since an idiom needs at least one direct relations to be in the graph
+                this.idiomCollection.updateOne({ _id: idiom._id }, { $unset: { equivalents: "" } });
+                deletes++;
+                continue;
+            }
+
+            const equivalentObjectIds = equivalents.map(eq => new ObjectID(eq.equivalentId));
+            const equivalentsToCloseSet = new Set(equivalentObjectIds.map(x => x.toHexString()));
+
+            if (equivalentObjectIds && equivalentObjectIds.length > 0) {
+                const equivalentQuery = this.activeOnly({ _id: { $in: equivalentObjectIds } });
+                const dbEquivalents = await this.idiomCollection.find(equivalentQuery).toArray();
+
+                // Get all unique idiom ids and make sure the idiom to close is missing them
+                const idiomId = idiom._id.toHexString();
+                const equivalentsToAdd = Array.from(new Set(dbEquivalents.flatMap(dbIdiom => (dbIdiom.equivalents || [])
+                    .map(eq => new ObjectID(eq.equivalentId))
+                    .filter(eq => eq.toHexString() !== idiomId))))
+                    .filter(x => !equivalentsToCloseSet.has(x.toHexString()));
+
+                if (equivalentsToAdd.length > 0) {
+                    let result = await this.addEquivalentsInternal(equivalentsToAdd, idiom.updateById || idiom.createdById, idiom._id, EquivalentSource.Inferred);
+                    if (result.status === OperationStatus.Failure) {
+                        failures++;
+                    }
+                    else if (result.status === OperationStatus.Success) {
+                        successes++;
+                    }
+                }
+            }
+        };
+
+        // Add a 20 minute buffer
+        let runDate = new Date(new Date().toUTCString());
+        runDate.setMinutes(runDate.getMinutes() - 20);
+        const message = `Updated ${successes}, deleted: ${deletes} and failed ${failures}`;
+        this.closureStatusCollection.update({}, {
+            _id: closureStatus ? closureStatus._id : null,
+            lastRunDate: runDate,
+            message: message
+        });
+
+        return this.operationResult(failures == 0 ? OperationStatus.Success : OperationStatus.Failure, message);
     }
 
     async updateIdiom(currentUser: UserModel, updateInput: IdiomUpdateInput, idiomExpandOptions: IdiomExpandOptions): Promise<IdiomOperationResult> {
@@ -482,23 +563,42 @@ export class IdiomDataProvider {
             return await this.submitChangeProposal(proposal);
         }
         else {
-            var bulk = this.idiomCollection.initializeOrderedBulkOp();
-            const equivalentToAddToSource: DbEquivalent = {
-                equivalentId: equivalentObjId,
-                source: EquivalentSource.Direct,
-                createdById: new ObjectID(currentUser.id)
-            }
-            const equivalentToAddToTarget: DbEquivalent = {
-                equivalentId: idiomObjId,
-                source: EquivalentSource.Direct,
-                createdById: new ObjectID(currentUser.id)
-            }
-            bulk.find({ _id: idiomObjId }).updateOne({ $addToSet: { equivalents: equivalentToAddToSource } });
-            bulk.find({ _id: equivalentObjId }).updateOne({ $addToSet: { equivalents: equivalentToAddToTarget } });
-            const result = await bulk.execute();
-
-            return !result.hasWriteErrors() ? this.operationResult(OperationStatus.Success) : this.operationResult(OperationStatus.Failure);
+            return await this.addEquivalentsInternal([equivalentObjId], currentUser.id, idiomObjId, EquivalentSource.Direct);
         }
+    }
+
+    private async addEquivalentsInternal(equivalentObjIds: ObjectID[], userId: ObjectID | string, idiomObjId: ObjectID, source: EquivalentSource) {
+
+        if (!equivalentObjIds || equivalentObjIds.length <= 0) {
+            return this.operationResult(OperationStatus.Failure, "No equivalents were given");
+        }
+
+        var bulk = this.idiomCollection.initializeOrderedBulkOp();
+        const equivalentsToAddToSource: DbEquivalent[] = equivalentObjIds.map((equivalentObjId) => {
+            return {
+                equivalentId: equivalentObjId,
+                source: source,
+                createdById: new ObjectID(userId)
+            }
+        });
+
+        const equivalentToAddToTarget: DbEquivalent = {
+            equivalentId: idiomObjId,
+            source: source,
+            createdById: new ObjectID(userId)
+        };
+
+        // If we are adding a direct equivalent, remove inferred ones (if they exist)
+        if (source === EquivalentSource.Direct) {
+            bulk.find({ _id: idiomObjId }).updateOne({ $pull: { equivalents: { equivalentId: { $in: equivalentsToAddToSource } } } });
+            bulk.find({ _id: { $in: equivalentObjIds } }).update({ $pull: { equivalents: { equivalentId: equivalentToAddToTarget } } });
+        }
+
+        bulk.find({ _id: idiomObjId }).updateOne({ $addToSet: { equivalents: { $each: equivalentsToAddToSource } } });
+        bulk.find({ _id: { $in: equivalentObjIds } }).update({ $addToSet: { equivalents: { equivalentToAddToTarget } } });
+
+        const result = await bulk.execute();
+        return !result.hasWriteErrors() ? this.operationResult(OperationStatus.Success) : this.operationResult(OperationStatus.Failure);
     }
 
     /**

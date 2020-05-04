@@ -3,11 +3,11 @@ export type Maybe<T> = T | null;
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string,
-  String: string,
-  Boolean: boolean,
-  Int: number,
-  Float: number,
+  ID: string;
+  String: string;
+  Boolean: boolean;
+  Int: number;
+  Float: number;
 };
 
 
@@ -18,160 +18,161 @@ export enum CacheControlScope {
 }
 
 export type Country = {
-   __typename?: 'Country',
-  countryKey: Scalars['String'],
-  countryName: Scalars['String'],
-  countryNativeName: Scalars['String'],
-  emojiFlag: Scalars['String'],
-  latitude: Scalars['Float'],
-  longitude: Scalars['Float'],
+   __typename?: 'Country';
+  countryKey: Scalars['String'];
+  countryName: Scalars['String'];
+  countryNativeName: Scalars['String'];
+  emojiFlag: Scalars['String'];
+  latitude: Scalars['Float'];
+  longitude: Scalars['Float'];
 };
 
 export type Idiom = {
-   __typename?: 'Idiom',
-  id: Scalars['ID'],
-  slug: Scalars['String'],
-  title: Scalars['String'],
-  description?: Maybe<Scalars['String']>,
-  tags: Array<Scalars['String']>,
-  transliteration?: Maybe<Scalars['String']>,
-  literalTranslation?: Maybe<Scalars['String']>,
-  equivalents: Array<Idiom>,
-  language: Language,
-  createdAt: Scalars['String'],
-  createdBy?: Maybe<User>,
-  updatedAt?: Maybe<Scalars['String']>,
-  updatedBy?: Maybe<User>,
+   __typename?: 'Idiom';
+  id: Scalars['ID'];
+  slug: Scalars['String'];
+  title: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  tags: Array<Scalars['String']>;
+  transliteration?: Maybe<Scalars['String']>;
+  literalTranslation?: Maybe<Scalars['String']>;
+  equivalents: Array<Idiom>;
+  language: Language;
+  createdAt: Scalars['String'];
+  createdBy?: Maybe<User>;
+  updatedAt?: Maybe<Scalars['String']>;
+  updatedBy?: Maybe<User>;
 };
 
 export type IdiomChangeProposal = {
-   __typename?: 'IdiomChangeProposal',
-  id: Scalars['ID'],
-  readOnlyType: Scalars['String'],
-  readOnlyCreatedBy: Scalars['String'],
-  readOnlyTitle?: Maybe<Scalars['String']>,
-  readOnlySlug?: Maybe<Scalars['String']>,
-  body: Scalars['String'],
+   __typename?: 'IdiomChangeProposal';
+  id: Scalars['ID'];
+  readOnlyType: Scalars['String'];
+  readOnlyCreatedBy: Scalars['String'];
+  readOnlyTitle?: Maybe<Scalars['String']>;
+  readOnlySlug?: Maybe<Scalars['String']>;
+  body: Scalars['String'];
 };
 
 export type IdiomChangeProposalConnection = {
-   __typename?: 'IdiomChangeProposalConnection',
-  edges: Array<IdiomChangeProposalEdge>,
-  pageInfo: PageInfo,
-  totalCount: Scalars['Int'],
+   __typename?: 'IdiomChangeProposalConnection';
+  edges: Array<IdiomChangeProposalEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int'];
 };
 
 export type IdiomChangeProposalEdge = {
-   __typename?: 'IdiomChangeProposalEdge',
-  cursor: Scalars['String'],
-  node: IdiomChangeProposal,
+   __typename?: 'IdiomChangeProposalEdge';
+  cursor: Scalars['String'];
+  node: IdiomChangeProposal;
 };
 
 export type IdiomConnection = {
-   __typename?: 'IdiomConnection',
-  edges: Array<IdiomEdge>,
-  pageInfo: PageInfo,
-  totalCount: Scalars['Int'],
+   __typename?: 'IdiomConnection';
+  edges: Array<IdiomEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int'];
 };
 
 export type IdiomCreateInput = {
-  title: Scalars['String'],
-  description?: Maybe<Scalars['String']>,
-  languageKey: Scalars['String'],
-  countryKeys?: Maybe<Array<Scalars['String']>>,
-  tags?: Maybe<Array<Scalars['String']>>,
-  transliteration?: Maybe<Scalars['String']>,
-  literalTranslation?: Maybe<Scalars['String']>,
-  relatedIdiomId?: Maybe<Scalars['ID']>,
+  title: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  languageKey: Scalars['String'];
+  countryKeys?: Maybe<Array<Scalars['String']>>;
+  tags?: Maybe<Array<Scalars['String']>>;
+  transliteration?: Maybe<Scalars['String']>;
+  literalTranslation?: Maybe<Scalars['String']>;
+  relatedIdiomId?: Maybe<Scalars['ID']>;
 };
 
 export type IdiomEdge = {
-   __typename?: 'IdiomEdge',
-  cursor: Scalars['String'],
-  node: Idiom,
+   __typename?: 'IdiomEdge';
+  cursor: Scalars['String'];
+  node: Idiom;
 };
 
 export type IdiomOperationResult = {
-   __typename?: 'IdiomOperationResult',
-  status: OperationStatus,
-  message?: Maybe<Scalars['String']>,
-  idiom?: Maybe<Idiom>,
+   __typename?: 'IdiomOperationResult';
+  status: OperationStatus;
+  message?: Maybe<Scalars['String']>;
+  idiom?: Maybe<Idiom>;
 };
 
 export type IdiomUpdateInput = {
-  id: Scalars['ID'],
-  title?: Maybe<Scalars['String']>,
-  description?: Maybe<Scalars['String']>,
-  transliteration?: Maybe<Scalars['String']>,
-  literalTranslation?: Maybe<Scalars['String']>,
-  tags?: Maybe<Array<Scalars['String']>>,
-  countryKeys?: Maybe<Array<Scalars['String']>>,
+  id: Scalars['ID'];
+  title?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  transliteration?: Maybe<Scalars['String']>;
+  literalTranslation?: Maybe<Scalars['String']>;
+  tags?: Maybe<Array<Scalars['String']>>;
+  countryKeys?: Maybe<Array<Scalars['String']>>;
 };
 
 export type Language = {
-   __typename?: 'Language',
-  languageName: Scalars['String'],
-  languageNativeName: Scalars['String'],
-  languageKey: Scalars['String'],
-  countries: Array<Country>,
+   __typename?: 'Language';
+  languageName: Scalars['String'];
+  languageNativeName: Scalars['String'];
+  languageKey: Scalars['String'];
+  countries: Array<Country>;
 };
 
 export type Login = {
-   __typename?: 'Login',
-  externalId: Scalars['ID'],
-  name: Scalars['String'],
-  email?: Maybe<Scalars['String']>,
-  avatar?: Maybe<Scalars['String']>,
-  type: ProviderType,
+   __typename?: 'Login';
+  externalId: Scalars['ID'];
+  name: Scalars['String'];
+  email?: Maybe<Scalars['String']>;
+  avatar?: Maybe<Scalars['String']>;
+  type: ProviderType;
 };
 
 export type Mutation = {
-   __typename?: 'Mutation',
-  updateIdiom: IdiomOperationResult,
-  createIdiom: IdiomOperationResult,
-  deleteIdiom: IdiomOperationResult,
-  addEquivalent: IdiomOperationResult,
-  removeEquivalent: IdiomOperationResult,
-  acceptIdiomChangeProposal: IdiomOperationResult,
-  rejectIdiomChangeProposal: IdiomOperationResult,
+   __typename?: 'Mutation';
+  updateIdiom: IdiomOperationResult;
+  createIdiom: IdiomOperationResult;
+  deleteIdiom: IdiomOperationResult;
+  addEquivalent: IdiomOperationResult;
+  removeEquivalent: IdiomOperationResult;
+  computeEquivalentClosure: IdiomOperationResult;
+  acceptIdiomChangeProposal: IdiomOperationResult;
+  rejectIdiomChangeProposal: IdiomOperationResult;
 };
 
 
 export type MutationUpdateIdiomArgs = {
-  idiom: IdiomUpdateInput
+  idiom: IdiomUpdateInput;
 };
 
 
 export type MutationCreateIdiomArgs = {
-  idiom: IdiomCreateInput
+  idiom: IdiomCreateInput;
 };
 
 
 export type MutationDeleteIdiomArgs = {
-  idiomId: Scalars['ID']
+  idiomId: Scalars['ID'];
 };
 
 
 export type MutationAddEquivalentArgs = {
-  idiomId: Scalars['ID'],
-  equivalentId: Scalars['ID']
+  idiomId: Scalars['ID'];
+  equivalentId: Scalars['ID'];
 };
 
 
 export type MutationRemoveEquivalentArgs = {
-  idiomId: Scalars['ID'],
-  equivalentId: Scalars['ID']
+  idiomId: Scalars['ID'];
+  equivalentId: Scalars['ID'];
 };
 
 
 export type MutationAcceptIdiomChangeProposalArgs = {
-  proposalId: Scalars['ID'],
-  body?: Maybe<Scalars['String']>
+  proposalId: Scalars['ID'];
+  body?: Maybe<Scalars['String']>;
 };
 
 
 export type MutationRejectIdiomChangeProposalArgs = {
-  proposalId: Scalars['ID']
+  proposalId: Scalars['ID'];
 };
 
 export enum OperationStatus {
@@ -182,9 +183,9 @@ export enum OperationStatus {
 }
 
 export type PageInfo = {
-   __typename?: 'PageInfo',
-  hasNextPage: Scalars['Boolean'],
-  endCursor: Scalars['String'],
+   __typename?: 'PageInfo';
+  hasNextPage: Scalars['Boolean'];
+  endCursor: Scalars['String'];
 };
 
 export enum ProviderType {
@@ -193,68 +194,68 @@ export enum ProviderType {
 }
 
 export type Query = {
-   __typename?: 'Query',
-  me?: Maybe<User>,
-  user?: Maybe<User>,
-  users: Array<Maybe<User>>,
-  idiom?: Maybe<Idiom>,
-  idioms: IdiomConnection,
-  languages: Array<Language>,
-  languagesWithIdioms: Array<Language>,
-  countries: Array<Country>,
-  idiomChangeProposal: IdiomChangeProposal,
-  idiomChangeProposals: IdiomChangeProposalConnection,
+   __typename?: 'Query';
+  me?: Maybe<User>;
+  user?: Maybe<User>;
+  users: Array<Maybe<User>>;
+  idiom?: Maybe<Idiom>;
+  idioms: IdiomConnection;
+  languages: Array<Language>;
+  languagesWithIdioms: Array<Language>;
+  countries: Array<Country>;
+  idiomChangeProposal: IdiomChangeProposal;
+  idiomChangeProposals: IdiomChangeProposalConnection;
 };
 
 
 export type QueryUserArgs = {
-  id: Scalars['ID']
+  id: Scalars['ID'];
 };
 
 
 export type QueryUsersArgs = {
-  filter?: Maybe<Scalars['String']>,
-  limit?: Maybe<Scalars['Int']>
+  filter?: Maybe<Scalars['String']>;
+  limit?: Maybe<Scalars['Int']>;
 };
 
 
 export type QueryIdiomArgs = {
-  id?: Maybe<Scalars['ID']>,
-  slug?: Maybe<Scalars['String']>
+  id?: Maybe<Scalars['ID']>;
+  slug?: Maybe<Scalars['String']>;
 };
 
 
 export type QueryIdiomsArgs = {
-  cursor?: Maybe<Scalars['String']>,
-  filter?: Maybe<Scalars['String']>,
-  locale?: Maybe<Scalars['String']>,
-  limit?: Maybe<Scalars['Int']>
+  cursor?: Maybe<Scalars['String']>;
+  filter?: Maybe<Scalars['String']>;
+  locale?: Maybe<Scalars['String']>;
+  limit?: Maybe<Scalars['Int']>;
 };
 
 
 export type QueryCountriesArgs = {
-  languageKey?: Maybe<Scalars['String']>
+  languageKey?: Maybe<Scalars['String']>;
 };
 
 
 export type QueryIdiomChangeProposalArgs = {
-  id?: Maybe<Scalars['ID']>
+  id?: Maybe<Scalars['ID']>;
 };
 
 
 export type QueryIdiomChangeProposalsArgs = {
-  cursor?: Maybe<Scalars['String']>,
-  filter?: Maybe<Scalars['String']>,
-  limit?: Maybe<Scalars['Int']>
+  cursor?: Maybe<Scalars['String']>;
+  filter?: Maybe<Scalars['String']>;
+  limit?: Maybe<Scalars['Int']>;
 };
 
 export type User = {
-   __typename?: 'User',
-  id: Scalars['ID'],
-  name: Scalars['String'],
-  avatar?: Maybe<Scalars['String']>,
-  role?: Maybe<UserRole>,
-  providers: Array<Maybe<Login>>,
+   __typename?: 'User';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  avatar?: Maybe<Scalars['String']>;
+  role?: Maybe<UserRole>;
+  providers: Array<Maybe<Login>>;
 };
 
 export enum UserRole {
@@ -268,13 +269,6 @@ export enum UserRole {
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
 
-export type ResolverFn<TResult, TParent, TContext, TArgs> = (
-  parent: TParent,
-  args: TArgs,
-  context: TContext,
-  info: GraphQLResolveInfo
-) => Promise<TResult> | TResult;
-
 
 export type StitchingResolver<TResult, TParent, TContext, TArgs> = {
   fragment: string;
@@ -284,6 +278,13 @@ export type StitchingResolver<TResult, TParent, TContext, TArgs> = {
 export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
   | ResolverFn<TResult, TParent, TContext, TArgs>
   | StitchingResolver<TResult, TParent, TContext, TArgs>;
+
+export type ResolverFn<TResult, TParent, TContext, TArgs> = (
+  parent: TParent,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => Promise<TResult> | TResult;
 
 export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
@@ -321,7 +322,9 @@ export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
   parent: TParent,
   context: TContext,
   info: GraphQLResolveInfo
-) => Maybe<TTypes>;
+) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
+
+export type isTypeOfResolverFn<T = {}> = (obj: T, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
 
 export type NextResolverFn<T> = () => Promise<T>;
 
@@ -391,10 +394,14 @@ export type ResolversParentTypes = {
   CacheControlScope: CacheControlScope,
 };
 
-export type CacheControlDirectiveResolver<Result, Parent, ContextType = any, Args = {   maxAge?: Maybe<Maybe<Scalars['Int']>>,
-  scope?: Maybe<Maybe<CacheControlScope>> }> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type CacheControlDirectiveArgs = {   maxAge?: Maybe<Scalars['Int']>;
+  scope?: Maybe<CacheControlScope>; };
 
-export type AuthDirectiveResolver<Result, Parent, ContextType = any, Args = {   requires?: Maybe<Maybe<UserRole>> }> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type CacheControlDirectiveResolver<Result, Parent, ContextType = any, Args = CacheControlDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type AuthDirectiveArgs = {   requires?: Maybe<UserRole>; };
+
+export type AuthDirectiveResolver<Result, Parent, ContextType = any, Args = AuthDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type CountryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Country'] = ResolversParentTypes['Country']> = {
   countryKey?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
@@ -403,6 +410,7 @@ export type CountryResolvers<ContextType = any, ParentType extends ResolversPare
   emojiFlag?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   latitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>,
   longitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
 export type IdiomResolvers<ContextType = any, ParentType extends ResolversParentTypes['Idiom'] = ResolversParentTypes['Idiom']> = {
@@ -419,6 +427,7 @@ export type IdiomResolvers<ContextType = any, ParentType extends ResolversParent
   createdBy?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>,
   updatedAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   updatedBy?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
 export type IdiomChangeProposalResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdiomChangeProposal'] = ResolversParentTypes['IdiomChangeProposal']> = {
@@ -428,34 +437,40 @@ export type IdiomChangeProposalResolvers<ContextType = any, ParentType extends R
   readOnlyTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   readOnlySlug?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   body?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
 export type IdiomChangeProposalConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdiomChangeProposalConnection'] = ResolversParentTypes['IdiomChangeProposalConnection']> = {
   edges?: Resolver<Array<ResolversTypes['IdiomChangeProposalEdge']>, ParentType, ContextType>,
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>,
   totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
 export type IdiomChangeProposalEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdiomChangeProposalEdge'] = ResolversParentTypes['IdiomChangeProposalEdge']> = {
   cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   node?: Resolver<ResolversTypes['IdiomChangeProposal'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
 export type IdiomConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdiomConnection'] = ResolversParentTypes['IdiomConnection']> = {
   edges?: Resolver<Array<ResolversTypes['IdiomEdge']>, ParentType, ContextType>,
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>,
   totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
 export type IdiomEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdiomEdge'] = ResolversParentTypes['IdiomEdge']> = {
   cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   node?: Resolver<ResolversTypes['Idiom'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
 export type IdiomOperationResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdiomOperationResult'] = ResolversParentTypes['IdiomOperationResult']> = {
   status?: Resolver<ResolversTypes['OperationStatus'], ParentType, ContextType>,
   message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   idiom?: Resolver<Maybe<ResolversTypes['Idiom']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
 export type LanguageResolvers<ContextType = any, ParentType extends ResolversParentTypes['Language'] = ResolversParentTypes['Language']> = {
@@ -463,6 +478,7 @@ export type LanguageResolvers<ContextType = any, ParentType extends ResolversPar
   languageNativeName?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   languageKey?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
 export type LoginResolvers<ContextType = any, ParentType extends ResolversParentTypes['Login'] = ResolversParentTypes['Login']> = {
@@ -471,6 +487,7 @@ export type LoginResolvers<ContextType = any, ParentType extends ResolversParent
   email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   avatar?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   type?: Resolver<ResolversTypes['ProviderType'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
@@ -479,6 +496,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteIdiom?: Resolver<ResolversTypes['IdiomOperationResult'], ParentType, ContextType, RequireFields<MutationDeleteIdiomArgs, 'idiomId'>>,
   addEquivalent?: Resolver<ResolversTypes['IdiomOperationResult'], ParentType, ContextType, RequireFields<MutationAddEquivalentArgs, 'idiomId' | 'equivalentId'>>,
   removeEquivalent?: Resolver<ResolversTypes['IdiomOperationResult'], ParentType, ContextType, RequireFields<MutationRemoveEquivalentArgs, 'idiomId' | 'equivalentId'>>,
+  computeEquivalentClosure?: Resolver<ResolversTypes['IdiomOperationResult'], ParentType, ContextType>,
   acceptIdiomChangeProposal?: Resolver<ResolversTypes['IdiomOperationResult'], ParentType, ContextType, RequireFields<MutationAcceptIdiomChangeProposalArgs, 'proposalId'>>,
   rejectIdiomChangeProposal?: Resolver<ResolversTypes['IdiomOperationResult'], ParentType, ContextType, RequireFields<MutationRejectIdiomChangeProposalArgs, 'proposalId'>>,
 };
@@ -486,19 +504,20 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 export type PageInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = {
   hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
   endCursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>,
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>,
-  users?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType, QueryUsersArgs>,
-  idiom?: Resolver<Maybe<ResolversTypes['Idiom']>, ParentType, ContextType, QueryIdiomArgs>,
-  idioms?: Resolver<ResolversTypes['IdiomConnection'], ParentType, ContextType, QueryIdiomsArgs>,
+  users?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType, RequireFields<QueryUsersArgs, never>>,
+  idiom?: Resolver<Maybe<ResolversTypes['Idiom']>, ParentType, ContextType, RequireFields<QueryIdiomArgs, never>>,
+  idioms?: Resolver<ResolversTypes['IdiomConnection'], ParentType, ContextType, RequireFields<QueryIdiomsArgs, never>>,
   languages?: Resolver<Array<ResolversTypes['Language']>, ParentType, ContextType>,
   languagesWithIdioms?: Resolver<Array<ResolversTypes['Language']>, ParentType, ContextType>,
-  countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, QueryCountriesArgs>,
-  idiomChangeProposal?: Resolver<ResolversTypes['IdiomChangeProposal'], ParentType, ContextType, QueryIdiomChangeProposalArgs>,
-  idiomChangeProposals?: Resolver<ResolversTypes['IdiomChangeProposalConnection'], ParentType, ContextType, QueryIdiomChangeProposalsArgs>,
+  countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<QueryCountriesArgs, never>>,
+  idiomChangeProposal?: Resolver<ResolversTypes['IdiomChangeProposal'], ParentType, ContextType, RequireFields<QueryIdiomChangeProposalArgs, never>>,
+  idiomChangeProposals?: Resolver<ResolversTypes['IdiomChangeProposalConnection'], ParentType, ContextType, RequireFields<QueryIdiomChangeProposalsArgs, never>>,
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
@@ -507,6 +526,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   avatar?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   role?: Resolver<Maybe<ResolversTypes['UserRole']>, ParentType, ContextType>,
   providers?: Resolver<Array<Maybe<ResolversTypes['Login']>>, ParentType, ContextType>,
+  __isTypeOf?: isTypeOfResolverFn<ParentType>,
 };
 
 export type Resolvers<ContextType = any> = {

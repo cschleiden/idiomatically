@@ -22,6 +22,8 @@ export default gql`
     addEquivalent(idiomId:ID!, equivalentId: ID!): IdiomOperationResult! @auth(requires: GENERAL)
 
     removeEquivalent(idiomId:ID!, equivalentId: ID!): IdiomOperationResult! @auth(requires: ADMIN)
+
+    computeEquivalentClosure: IdiomOperationResult! @auth(requires: ADMIN)
   }
 
   enum OperationStatus {
