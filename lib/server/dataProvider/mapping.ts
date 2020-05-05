@@ -56,6 +56,7 @@ export interface DbEquivalentClosureStatus {
 
 export interface DbIdiom {
     _id?: ObjectID,
+    partition: string,
     slug: string,
     title: string,
     description: string,

@@ -10,6 +10,12 @@ import { UserDataProvider } from './userDataProvider';
 // Max number of proposals one user can have before we prevent more
 const MaxPendingProposals = 25;
 
+// We are using partition collection on CosmosDB's mongodb api
+// This requires that we have a partition key. However, we only really need to use it if 
+// we have more than 10gigs of data. In the future we will have multiple partitions but for now
+// one fixed one is fine
+const idiomPartitionKey = "1";
+
 export class IdiomDataProvider {
 
     private changeProposalCollection: Collection<DbIdiomChangeProposal>;
@@ -66,10 +72,10 @@ export class IdiomDataProvider {
             return this.operationResult(OperationStatus.Pending);
         }
         else {
-            const deleteResult = await this.idiomCollection.deleteOne({ _id: objectId });
+            const deleteResult = await this.idiomCollection.deleteOne({ _id: objectId, partition: idiomPartitionKey });
             const itemsToUpdate = await this.idiomCollection.find({ equivalents: { $elemMatch: { equivalentId: objectId } } }).toArray();
             const itemIdsToUpdate = itemsToUpdate.map(x => x._id);
-            await this.idiomCollection.updateMany({ _id: { $in: itemIdsToUpdate } }, { $pull: { equivalents: { equivalentId: objectId } } });
+            await this.idiomCollection.updateMany({ _id: { $in: itemIdsToUpdate }, partition: idiomPartitionKey }, { $pull: { equivalents: { equivalentId: objectId } } });
 
             return deleteResult && deleteResult.deletedCount && deleteResult.deletedCount > 0
                 ? this.operationResult(OperationStatus.Success) : this.operationResult(OperationStatus.Failure);
@@ -105,6 +111,7 @@ export class IdiomDataProvider {
 
         var dbIdiom: DbIdiom = {
             title: createInput.title,
+            partition: idiomPartitionKey,
             slug: idiomSlug,
             description: createInput.description,
             tags: createInput.tags,
@@ -112,7 +119,8 @@ export class IdiomDataProvider {
             countryKeys: createInput.countryKeys,
             transliteration: createInput.transliteration,
             literalTranslation: createInput.literalTranslation,
-            createdById: new ObjectID(currentUser.id)
+            createdById: new ObjectID(currentUser.id),
+
         };
 
         const relatedIdiomId = createInput.relatedIdiomId;
@@ -209,7 +217,7 @@ export class IdiomDataProvider {
             if (!equivalents.some(e => e.source === EquivalentSource.Direct)) {
                 // If an idiom has no direct relation it should have all indirects removed.
                 // Since an idiom needs at least one direct relations to be in the graph
-                this.idiomCollection.updateOne({ _id: idiom._id }, { $unset: { equivalents: "" } });
+                this.idiomCollection.updateOne({ _id: idiom._id, partition: idiomPartitionKey }, { $unset: { equivalents: "" } });
                 deletes++;
                 continue;
             }
@@ -244,7 +252,7 @@ export class IdiomDataProvider {
         let runDate = new Date(new Date().toUTCString());
         runDate.setMinutes(runDate.getMinutes() - 20);
         const message = `Updated ${successes}, deleted: ${deletes} and failed ${failures}`;
-        this.closureStatusCollection.update({}, {
+        this.closureStatusCollection.updateOne({}, {
             _id: closureStatus ? closureStatus._id : null,
             lastRunDate: runDate,
             message: message
@@ -312,7 +320,7 @@ export class IdiomDataProvider {
             return await this.submitChangeProposal(proposal);
         }
         else {
-            const result = await this.idiomCollection.updateOne({ _id: objId }, { $set: updates });
+            const result = await this.idiomCollection.updateOne({ _id: objId, partition: idiomPartitionKey }, { $set: updates });
 
             if (result.matchedCount <= 0) {
                 throw new Error("Failed to update idiom");
@@ -530,8 +538,8 @@ export class IdiomDataProvider {
         }
         else {
             var bulk = this.idiomCollection.initializeOrderedBulkOp();
-            bulk.find({ _id: idiomObjId }).updateOne({ $pull: { equivalents: { equivalentId: equivalentObjId } } });
-            bulk.find({ _id: equivalentObjId }).updateOne({ $pull: { equivalents: { equivalentId: idiomObjId } } });
+            bulk.find({ _id: idiomObjId, partition: idiomPartitionKey }).updateOne({ $pull: { equivalents: { equivalentId: equivalentObjId } } });
+            bulk.find({ _id: equivalentObjId, partition: idiomPartitionKey }).updateOne({ $pull: { equivalents: { equivalentId: idiomObjId } } });
             const result = await bulk.execute();
             return !result.hasWriteErrors() ? this.operationResult(OperationStatus.Success) : this.operationResult(OperationStatus.Failure);
         }
@@ -590,12 +598,14 @@ export class IdiomDataProvider {
 
         // If we are adding a direct equivalent, remove inferred ones (if they exist)
         if (source === EquivalentSource.Direct) {
-            bulk.find({ _id: idiomObjId }).updateOne({ $pull: { equivalents: { equivalentId: { $in: equivalentsToAddToSource } } } });
-            bulk.find({ _id: { $in: equivalentObjIds } }).update({ $pull: { equivalents: { equivalentId: equivalentToAddToTarget } } });
+            const equivalentsToAddToSourceIds = equivalentsToAddToSource.map(x => x.equivalentId);
+            const equivalentToAddToTargetId = equivalentToAddToTarget.equivalentId;
+            bulk.find({ _id: idiomObjId, partition: idiomPartitionKey }).updateOne({ $pull: { equivalents: { equivalentId: { $in: equivalentsToAddToSourceIds } } } });
+            bulk.find({ _id: { $in: equivalentObjIds }, partition: idiomPartitionKey }).update({ $pull: { equivalents: { equivalentId: equivalentToAddToTargetId } } });
         }
 
-        bulk.find({ _id: idiomObjId }).updateOne({ $addToSet: { equivalents: { $each: equivalentsToAddToSource } } });
-        bulk.find({ _id: { $in: equivalentObjIds } }).update({ $addToSet: { equivalents: { equivalentToAddToTarget } } });
+        bulk.find({ _id: idiomObjId, partition: idiomPartitionKey }).updateOne({ $addToSet: { equivalents: { $each: equivalentsToAddToSource } } });
+        bulk.find({ _id: { $in: equivalentObjIds }, partition: idiomPartitionKey }).update({ $addToSet: { equivalents: equivalentToAddToTarget } });
 
         const result = await bulk.execute();
         return !result.hasWriteErrors() ? this.operationResult(OperationStatus.Success) : this.operationResult(OperationStatus.Failure);
