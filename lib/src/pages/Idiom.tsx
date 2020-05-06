@@ -14,7 +14,7 @@ import {
 import { useCurrentUser } from "../components/withCurrentUser";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import marked from "marked";
 import dompurifyFactory from "dompurify";
 import { AddEquivalentSection } from "../components/AddEquivalentSection";
@@ -61,6 +61,17 @@ export const Idiom: React.StatelessComponent<IdiomCombinedProps> = props => {
   });
 
   const [deleteIdiom, deleteStatusInfo] = useMutation<DeleteIdiomMutation, DeleteIdiomMutationVariables>(deleteIdiomQuery);
+
+
+  useEffect(() => {
+    const title = data?.idiom?.title;
+    if (title) {
+      document.title = `Idiomatically - ${title}`;
+    }
+    else {
+      document.title = `Idiomatically`;
+    }
+  }, [data?.idiom?.title]);
 
   if (deleteStatusInfo.data && deleteStatusInfo.data.deleteIdiom.status === OperationStatus.SUCCESS) {
     return <Redirect to="/" />;

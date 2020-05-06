@@ -73,7 +73,7 @@ export class IdiomDataProvider {
         }
         else {
             const deleteResult = await this.idiomCollection.deleteOne({ _id: objectId, partition: idiomPartitionKey });
-            const itemsToUpdate = await this.idiomCollection.find({ equivalents: { $elemMatch: { equivalentId: objectId } } }).toArray();
+            const itemsToUpdate = await this.idiomCollection.find({ equivalents: { $elemMatch: { equivalentId: objectId } } }, { projection: { _id: 1 } }).toArray();
             const itemIdsToUpdate = itemsToUpdate.map(x => x._id);
             await this.idiomCollection.updateMany({ _id: { $in: itemIdsToUpdate }, partition: idiomPartitionKey }, { $pull: { equivalents: { equivalentId: objectId } } });
 
@@ -137,7 +137,7 @@ export class IdiomDataProvider {
         const titleRegex = "^" + escapeRegex(dbIdiom.title) + "$";
         const titleRegexObj = { $regex: titleRegex, $options: 'i' };
         const dupeFilter = this.activeOnly({ $or: [{ title: titleRegexObj }, { slug: { $eq: dbIdiom.slug } }] });
-        const dupeIdioms = await this.idiomCollection.find(dupeFilter).toArray();
+        const dupeIdioms = await this.idiomCollection.find(dupeFilter, { projection: { title: 1, slug: 1 } }).toArray();
         if (dupeIdioms) {
 
             // If dupe title, throw. Ideally this could be a fuzzy smart match in the future
@@ -202,7 +202,7 @@ export class IdiomDataProvider {
 
         findFilter = this.activeOnly(findFilter);
 
-        const idiomsToClosure = await this.idiomCollection.find(findFilter).toArray();
+        const idiomsToClosure = await this.idiomCollection.find(findFilter, { projection: { _id: 1, equivalents: 1, updateById: 1, createdById: 1 } }).toArray();
 
         let failures = 0;
         let successes = 0;
@@ -227,11 +227,12 @@ export class IdiomDataProvider {
 
             if (equivalentObjectIds && equivalentObjectIds.length > 0) {
                 const equivalentQuery = this.activeOnly({ _id: { $in: equivalentObjectIds } });
-                const dbEquivalents = await this.idiomCollection.find(equivalentQuery).toArray();
+                const dbEquivalents = await this.idiomCollection.find(equivalentQuery, { projection: { equivalents: 1 } }).toArray();
 
                 // Get all unique idiom ids and make sure the idiom to close is missing them
                 const idiomId = idiom._id.toHexString();
                 const equivalentsToAdd = Array.from(new Set(dbEquivalents.flatMap(dbIdiom => (dbIdiom.equivalents || [])
+                    .filter(eq => !!eq.equivalentId)
                     .map(eq => new ObjectID(eq.equivalentId))
                     .filter(eq => eq.toHexString() !== idiomId))))
                     .filter(x => !equivalentsToCloseSet.has(x.toHexString()));
@@ -252,11 +253,13 @@ export class IdiomDataProvider {
         let runDate = new Date(new Date().toUTCString());
         runDate.setMinutes(runDate.getMinutes() - 20);
         const message = `Updated ${successes}, deleted: ${deletes} and failed ${failures}`;
-        this.closureStatusCollection.updateOne({}, {
-            _id: closureStatus ? closureStatus._id : null,
+        const statusId = closureStatus ? closureStatus._id : new ObjectID();
+        await this.closureStatusCollection.replaceOne({ partition: "1", _id: statusId }, {
+            _id: statusId,
             lastRunDate: runDate,
-            message: message
-        });
+            message: message,
+            partition: "1"
+        }, { upsert: true });
 
         return this.operationResult(failures == 0 ? OperationStatus.Success : OperationStatus.Failure, message);
     }
@@ -295,7 +298,7 @@ export class IdiomDataProvider {
             const titleRegex = "^" + escapeRegex(updates.title) + "$";
             const titleRegexObj = { $regex: titleRegex, $options: 'i' };
             const dupeFilter = this.activeOnly({ title: titleRegexObj, _id: { $ne: objId } });
-            const dupeIdioms = await this.idiomCollection.find(dupeFilter).toArray();
+            const dupeIdioms = await this.idiomCollection.find(dupeFilter, { projection: { title: 1 } }).toArray();
             if (dupeIdioms) {
                 // If dupe title, throw. Ideally this could be a fuzzy smart match in the future
                 if (dupeIdioms.some(idiom => idiom.title === updates.title)) {
@@ -520,7 +523,7 @@ export class IdiomDataProvider {
         const idiomObjId = new ObjectID(idiomId);
         const equivalentObjId = new ObjectID(equivalentId);
         const objIds = [idiomObjId, equivalentObjId];
-        const dbIdioms = await this.idiomCollection.find({ _id: { $in: objIds } }).toArray();
+        const dbIdioms = await this.idiomCollection.find({ _id: { $in: objIds } }, { projection: { _id: 1 } }).toArray();
         if (dbIdioms.length < 2) {
             throw new Error("Failed to resolve both idioms");
         }
@@ -554,9 +557,9 @@ export class IdiomDataProvider {
         const idiomObjId = new ObjectID(idiomId);
         const equivalentObjId = new ObjectID(equivalentId);
         const objIds = [idiomObjId, equivalentObjId];
-        const dbIdioms = await this.idiomCollection.find({ _id: { $in: objIds } }).toArray();
+        const dbIdioms = await this.idiomCollection.find({ _id: { $in: objIds } }, { projection: { _id: 1 } }).toArray();
         if (dbIdioms.length < 2) {
-            throw new Error("Fails to resolve both idioms");
+            throw new Error("Failed to resolve both idioms");
         }
 
         if (this.isUserProvisional(currentUser) && !forceWrite) {
@@ -581,6 +584,8 @@ export class IdiomDataProvider {
             return this.operationResult(OperationStatus.Failure, "No equivalents were given");
         }
 
+        const updatedAt = new Date(new Date().toUTCString());
+        const updateById = new ObjectID(userId);
         var bulk = this.idiomCollection.initializeOrderedBulkOp();
         const equivalentsToAddToSource: DbEquivalent[] = equivalentObjIds.map((equivalentObjId) => {
             return {
@@ -596,16 +601,20 @@ export class IdiomDataProvider {
             createdById: new ObjectID(userId)
         };
 
+        const equivalentsToAddToSourceIds = equivalentsToAddToSource.map(x => x.equivalentId);
+        const equivalentToAddToTargetId = equivalentToAddToTarget.equivalentId;
         // If we are adding a direct equivalent, remove inferred ones (if they exist)
         if (source === EquivalentSource.Direct) {
-            const equivalentsToAddToSourceIds = equivalentsToAddToSource.map(x => x.equivalentId);
-            const equivalentToAddToTargetId = equivalentToAddToTarget.equivalentId;
             bulk.find({ _id: idiomObjId, partition: idiomPartitionKey }).updateOne({ $pull: { equivalents: { equivalentId: { $in: equivalentsToAddToSourceIds } } } });
             bulk.find({ _id: { $in: equivalentObjIds }, partition: idiomPartitionKey }).update({ $pull: { equivalents: { equivalentId: equivalentToAddToTargetId } } });
         }
 
-        bulk.find({ _id: idiomObjId, partition: idiomPartitionKey }).updateOne({ $addToSet: { equivalents: { $each: equivalentsToAddToSource } } });
-        bulk.find({ _id: { $in: equivalentObjIds }, partition: idiomPartitionKey }).update({ $addToSet: { equivalents: equivalentToAddToTarget } });
+        for (const equivalentToAddToSource of equivalentsToAddToSource) {
+            bulk.find({ _id: idiomObjId, partition: idiomPartitionKey, "equivalents.equivalentId": { $nin: [equivalentToAddToSource.equivalentId] } })
+                .updateOne({ $set: { updatedAt: updatedAt, updateById: updateById }, $addToSet: { equivalents: equivalentToAddToSource } });
+        }
+        bulk.find({ _id: { $in: equivalentObjIds }, partition: idiomPartitionKey, "equivalents.equivalentId": { $not: { $eq: equivalentToAddToTargetId } } })
+            .update({ $set: { updatedAt: updatedAt, updateById: updateById }, $addToSet: { equivalents: equivalentToAddToTarget } });
 
         const result = await bulk.execute();
         return !result.hasWriteErrors() ? this.operationResult(OperationStatus.Success) : this.operationResult(OperationStatus.Failure);

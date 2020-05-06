@@ -50,6 +50,7 @@ export interface DbEquivalent {
 
 export interface DbEquivalentClosureStatus {
     _id?: ObjectID,
+    partition: string,
     lastRunDate?: Date,
     message?: string
 }

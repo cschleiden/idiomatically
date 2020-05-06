@@ -23,6 +23,8 @@ function AppInternal(props: RouteComponentProps<any> & AppProps) {
   const filter = params.get("q");
   const lang = params.get("lang");
 
+  document.title = "Idiomatically";
+
   return (
     <Layout className="container">
       <Header>
