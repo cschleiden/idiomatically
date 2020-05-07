@@ -55,7 +55,7 @@ export function SearchBox(props: SearchBoxProps) {
   const loadLangs = !loading && data && data.languagesWithIdioms;
   const defaultLangs: GetLanguagesWithIdioms_languagesWithIdioms[] = [
     {
-      languageKey: "",
+      languageKey: "all",
       languageName: "All",
       languageNativeName: "All",
       __typename: "Language"
@@ -66,7 +66,7 @@ export function SearchBox(props: SearchBoxProps) {
     langs = langs.concat(loadLangs);
   }
 
-  let defaultValue: string = getLanguageName(props.language) || "All";
+  let defaultValue: string = getLanguageName(props.language) || "English";
 
   let selectAfter: JSX.Element = (
     <Select

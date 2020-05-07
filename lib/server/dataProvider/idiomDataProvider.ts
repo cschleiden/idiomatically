@@ -4,7 +4,7 @@ import { Languages, LanguageModel } from './languages'
 import { UserModel, IdiomExpandOptions } from '../model/types';
 import { DbIdiom, mapDbIdiom, DbIdiomChangeProposal, IdiomProposalType, Paged, DbEquivalent, EquivalentSource, DbEquivalentClosureStatus } from './mapping';
 import { transliterate, slugify } from 'transliteration';
-import { escapeRegex } from './utils';
+import { escapeRegex, sleep } from './utils';
 import { UserDataProvider } from './userDataProvider';
 
 // Max number of proposals one user can have before we prevent more
@@ -186,16 +186,16 @@ export class IdiomDataProvider {
 
         let findFilter: FilterQuery<DbIdiom> = null;
         const closureStatus = await this.closureStatusCollection.findOne({});
-        if (closureStatus && closureStatus.lastRunDate) {
+        if (closureStatus && closureStatus.nextRunDate) {
             findFilter = {
                 $or: [
                     {
                         $and: [
-                            { createdAt: { $gt: closureStatus.lastRunDate } },
+                            { createdAt: { $gt: closureStatus.nextRunDate } },
                             { updatedAt: null }
                         ]
                     },
-                    { updatedAt: { $gt: closureStatus.lastRunDate } }
+                    { updatedAt: { $gt: closureStatus.nextRunDate } }
                 ]
             }
         }
@@ -208,7 +208,6 @@ export class IdiomDataProvider {
         let successes = 0;
         let deletes = 0;
         for (const idiom of idiomsToClosure) {
-
             const equivalents = idiom.equivalents || [];
             if (equivalents.length <= 0) {
                 continue;
@@ -226,6 +225,9 @@ export class IdiomDataProvider {
             const equivalentsToCloseSet = new Set(equivalentObjectIds.map(x => x.toHexString()));
 
             if (equivalentObjectIds && equivalentObjectIds.length > 0) {
+                // Wait a bit for querying to ensure we dont over query
+                await sleep(500);
+
                 const equivalentQuery = this.activeOnly({ _id: { $in: equivalentObjectIds } });
                 const dbEquivalents = await this.idiomCollection.find(equivalentQuery, { projection: { equivalents: 1 } }).toArray();
 
@@ -238,6 +240,10 @@ export class IdiomDataProvider {
                     .filter(x => !equivalentsToCloseSet.has(x.toHexString()));
 
                 if (equivalentsToAdd.length > 0) {
+
+                    // Wait longer before writing equivalents since this can be expensive
+                    await sleep(5000);
+
                     let result = await this.addEquivalentsInternal(equivalentsToAdd, idiom.updateById || idiom.createdById, idiom._id, EquivalentSource.Inferred);
                     if (result.status === OperationStatus.Failure) {
                         failures++;
@@ -250,14 +256,16 @@ export class IdiomDataProvider {
         };
 
         // Add a 20 minute buffer
-        let runDate = new Date(new Date().toUTCString());
-        runDate.setMinutes(runDate.getMinutes() - 20);
+        let lastRunDate = new Date(new Date().toUTCString());
+        let nextRunDate = new Date(new Date().toUTCString());
+        nextRunDate.setMinutes(nextRunDate.getMinutes() - 20);
         const message = `Updated ${successes}, deleted: ${deletes} and failed ${failures}`;
         const statusId = closureStatus ? closureStatus._id : new ObjectID();
-        await this.closureStatusCollection.replaceOne({ partition: "1", _id: statusId }, {
+        await this.closureStatusCollection.updateOne({ partition: "1", _id: statusId }, {
             _id: statusId,
-            lastRunDate: runDate,
-            message: message,
+            lastRunDate: lastRunDate,
+            nextRunDate: nextRunDate,
+            resultMessage: message,
             partition: "1"
         }, { upsert: true });
 
@@ -445,7 +453,7 @@ export class IdiomDataProvider {
     async queryIdioms(args: QueryIdiomsArgs, idiomExpandOptions: IdiomExpandOptions): Promise<Paged<Idiom>> {
         const filter = args && args.filter ? args.filter : undefined;
         const limit = args && args.limit ? args.limit : 50;
-        const locale = args && args.locale ? args.locale : undefined;
+        const locale = args && args.locale ? args.locale : "en";
         let skip = args && args.cursor && Number.parseInt(args.cursor);
         if (isNaN(skip)) {
             skip = 0;
@@ -457,7 +465,7 @@ export class IdiomDataProvider {
         let sortObj: object = { "equivCount": -1 };
         let users: UserModel[];
 
-        if (locale) {
+        if (locale && locale.toLocaleLowerCase() !== "all") {
             findFilter = { languageKey: { $eq: locale } };
         }
 

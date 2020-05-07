@@ -49,7 +49,6 @@ export const IdiomListView: React.StatelessComponent<IdiomListViewProps> = props
     GetIdiomListQueryVariables
   >(getIdiomListQuery);
   const pageSize = 10;
-  const locale = language && language.toLowerCase() === "all" ? null : language;
 
   useEffect(() => {
     setLastFilter(props.filter);
@@ -81,7 +80,7 @@ export const IdiomListView: React.StatelessComponent<IdiomListViewProps> = props
     queryPage({
       variables: {
         filter,
-        locale,
+        locale: language,
         limit: pageSize,
         cursor: currCursorNum.toString()
       }

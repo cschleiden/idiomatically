@@ -23,7 +23,9 @@ function AppInternal(props: RouteComponentProps<any> & AppProps) {
   const filter = params.get("q");
   const lang = params.get("lang");
 
-  document.title = "Idiomatically";
+  if (window && window.document && window.document.title) {
+    window.document.title = "Idiomatically";
+  }
 
   return (
     <Layout className="container">

@@ -36,7 +36,8 @@ const start = async () => {
     });
 
     appInsights.setup(process.env.APP_INSIGHTS_KEY).start()
-
+    appInsights.start();
+    
     const isProd = process.env.NODE_ENV === 'production';
     const serverUrl = process.env.SERVER_URL;
     const clientUrl = process.env.CLIENT_URL;

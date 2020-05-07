@@ -52,7 +52,8 @@ export interface DbEquivalentClosureStatus {
     _id?: ObjectID,
     partition: string,
     lastRunDate?: Date,
-    message?: string
+    nextRunDate?: Date,
+    resultMessage?: string
 }
 
 export interface DbIdiom {

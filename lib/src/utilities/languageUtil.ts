@@ -6,6 +6,10 @@ export function getLanguageName(languageKey: string | null): (string | null) {
         return null;
     }
 
+    if (languageKey.toLocaleLowerCase() === "all") {
+        return "All";
+    }
+
     const language: Language = languagesAll[languageKey] || langaugesList[languageKey];
     if (language.name == null) {
         return null;

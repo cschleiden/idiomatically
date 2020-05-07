@@ -62,16 +62,17 @@ export const Idiom: React.StatelessComponent<IdiomCombinedProps> = props => {
 
   const [deleteIdiom, deleteStatusInfo] = useMutation<DeleteIdiomMutation, DeleteIdiomMutationVariables>(deleteIdiomQuery);
 
-
+  const idiomTitle = data?.idiom?.title;
   useEffect(() => {
-    const title = data?.idiom?.title;
-    if (title) {
-      document.title = `Idiomatically - ${title}`;
+    if (window.document && window.document.title) {
+      if (idiomTitle) {
+        window.document.title = `Idiomatically - ${idiomTitle}`;
+      }
+      else {
+        window.document.title = `Idiomatically`;
+      }
     }
-    else {
-      document.title = `Idiomatically`;
-    }
-  }, [data?.idiom?.title]);
+  }, [idiomTitle]);
 
   if (deleteStatusInfo.data && deleteStatusInfo.data.deleteIdiom.status === OperationStatus.SUCCESS) {
     return <Redirect to="/" />;
