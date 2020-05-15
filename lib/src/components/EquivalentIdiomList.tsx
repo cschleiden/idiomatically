@@ -97,7 +97,7 @@ const EquivalentIdiomItem: React.StatelessComponent<EquivalentItemProps> = props
     removeEquivalentMutationResult &&
     removeEquivalentMutationResult.data &&
     removeEquivalentMutationResult.data.removeEquivalent.status ===
-      OperationStatus.SUCCESS;
+    OperationStatus.SUCCESS;
   if (equivalentRemoved) {
     return null;
   }
@@ -124,7 +124,5 @@ const EquivalentIdiomItem: React.StatelessComponent<EquivalentItemProps> = props
     </Button>
   );
 
-  return renderIdiomListItem(equivalent, [action], {
-    includeLiteralTranslation: false
-  });
+  return renderIdiomListItem(equivalent, [action]);
 };
