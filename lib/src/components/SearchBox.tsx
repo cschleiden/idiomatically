@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as H from "history";
 import "./SearchBox.scss";
 import { Input, Select } from "antd";
 import gql from "graphql-tag";
@@ -23,34 +22,16 @@ export const getLanguagesWithIdiomsQuery = gql`
 `;
 
 export interface SearchBoxProps {
-  history: H.History;
   filter: string | null;
   language: string | null;
+  onSearch: (value: string) => void;
+  onLanguageChange: (value: string) => void;
 }
 
 export function SearchBox(props: SearchBoxProps) {
   const { data, loading } = useQuery<GetLanguagesWithIdioms>(
     getLanguagesWithIdiomsQuery
   );
-
-  const onSearch = (value: string) => {
-    let search = `?q=${value}`;
-    if (props.language) {
-      search += `&lang=${props.language}`;
-    }
-    props.history.push({ pathname: "/idioms", search: search });
-  };
-
-  const onLanguageChange = (value: string) => {
-    let search = `?`;
-    if (props.filter) {
-      search += `q=${props.filter}`;
-      search += `&lang=${value}`;
-    } else {
-      search += `lang=${value}`;
-    }
-    props.history.push({ pathname: "/idioms", search: search });
-  };
 
   const loadLangs = !loading && data && data.languagesWithIdioms;
   const defaultLangs: GetLanguagesWithIdioms_languagesWithIdioms[] = [
@@ -71,9 +52,10 @@ export function SearchBox(props: SearchBoxProps) {
   let selectAfter: JSX.Element = (
     <Select
       defaultValue={defaultValue}
+      value={props.language ? props.language : defaultValue}
       className="languageSelect"
       dropdownClassName="languageOptionContainer"
-      onChange={onLanguageChange}
+      onChange={props.onLanguageChange}
     >
       {langs.map(lang => {
         return (
@@ -96,9 +78,10 @@ export function SearchBox(props: SearchBoxProps) {
       className="idiomSearchBox"
       placeholder="Find an idiom"
       size="large"
+      value={props.filter || undefined}
       enterButton
       addonAfter={selectAfter}
-      onSearch={onSearch}
+      onSearch={props.onSearch}
     />
   );
 }

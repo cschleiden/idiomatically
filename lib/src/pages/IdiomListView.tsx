@@ -37,11 +37,26 @@ export const getIdiomListQuery = gql`
 export interface IdiomListViewProps {
   filter: string | null;
   language: string | null;
+  page: string | null;
+  onPageChange: (value: string) => void;
+}
+
+function normalizePage(page: string | null) {
+  if (!page) {
+    return 1;
+  }
+
+  const num = parseInt(page);
+  if (isNaN(num)) {
+    return 1;
+  }
+
+  return num;
 }
 
 export const IdiomListView: React.StatelessComponent<IdiomListViewProps> = props => {
   const { filter, language } = props;
-  const [pageNumber, setPageNumber] = React.useState(1);
+  const pageNumber = normalizePage(props.page);
   const [lastFilter, setLastFilter] = React.useState(props.filter);
   const [lastLang, setLastLang] = React.useState(props.language);
   const [queryPage, loadResult] = useLazyQuery<
@@ -61,15 +76,18 @@ export const IdiomListView: React.StatelessComponent<IdiomListViewProps> = props
   const currCursorNum = (pageNumber - 1) * pageSize;
   const nextCursorNum = pageNumber * pageSize;
   const incomingEndCursorNum =
-    loadResult.data && loadResult.data.idioms.totalCount > 0
+    loadResult.data && loadResult.data.idioms.totalCount > 0 && loadResult.data.idioms.edges.length > 0
       ? Number.parseInt(loadResult.data.idioms.pageInfo.endCursor)
       : null;
   const changePage =
     incomingEndCursorNum != null &&
+
+    // And incomingEndCursorNum not in (currCursorNum, nextCursorNum]
     !(
       currCursorNum < incomingEndCursorNum &&
       nextCursorNum >= incomingEndCursorNum
-    );
+    )
+    ;
   const filterChanged =
     props.filter !== lastFilter || props.language !== lastLang;
   if (
@@ -117,7 +135,7 @@ export const IdiomListView: React.StatelessComponent<IdiomListViewProps> = props
       idioms={idioms}
       pageNumber={pageNumber}
       onPageChange={(page: number, size?: number) => {
-        setPageNumber(page);
+        props.onPageChange(String(page));
       }}
     />
   );

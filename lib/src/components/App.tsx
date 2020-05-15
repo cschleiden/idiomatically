@@ -20,8 +20,38 @@ export interface AppProps {
 
 function AppInternal(props: RouteComponentProps<any> & AppProps) {
   const params = new URLSearchParams(props.location!.search);
-  const filter = params.get("q");
-  const lang = params.get("lang");
+  const queryFilter = params.get("q");
+  const queryLang = params.get("lang");
+  const queryPage = params.get("page");
+
+  const updateSearchParams = useCallback((lang: string | null, filter: string | null, page?: string | null) => {
+    let search = `?`;
+    const params = [];
+    if (filter) {
+      params.push(`q=${filter}`);
+    }
+    if (lang) {
+      params.push(`lang=${lang}`);
+    }
+    if (page) {
+      params.push(`page=${page}`);
+    }
+    search += params.reduce((prev, curr) => `${prev}&${curr}`);
+    props.history.push({ pathname: "/idioms", search: search });
+  }, [props.history]);
+
+  const onPageChange = useCallback((value: string) => {
+    updateSearchParams(queryLang, queryFilter, value);
+  }, [queryLang, queryFilter, updateSearchParams]);
+
+  const onSearchChange = useCallback((value: string) => {
+    updateSearchParams(queryLang, value);
+  }, [queryLang, updateSearchParams]);
+
+  const onLanguageChange = useCallback((value: string) => {
+    updateSearchParams(value, queryFilter);
+  }, [queryFilter, updateSearchParams]);
+
 
   if (window && window.document && window.document.title) {
     window.document.title = "Idiomatically";
@@ -35,13 +65,13 @@ function AppInternal(props: RouteComponentProps<any> & AppProps) {
         </h1>
         <h2>{props.subTitle}</h2>
         <NavCommandBar {...props} />
-        <SearchBox history={props.history} filter={filter} language={lang} />
+        <SearchBox onSearch={onSearchChange} onLanguageChange={onLanguageChange} filter={queryFilter} language={queryLang} />
       </Header>
       <Content>
         <Switch>
-          <Route exact path="/" render={props => renderListView(props, filter, lang)} />
+          <Route exact path="/" render={props => renderListView(props, queryFilter, queryLang, queryPage, onPageChange)} />
           <Route exact path="/about" component={About} />
-          <Route exact path="/idioms" render={props => renderListView(props, filter, lang)} />
+          <Route exact path="/idioms" render={props => renderListView(props, queryFilter, queryLang, queryPage, onPageChange)} />
           <Route exact path="/idioms/:slug" component={renderIdiom} />
           <Route exact path="/new" render={props => renderNewIdiomForm(props)} />
           <Route exact path="/idioms/:slug/update" render={props => renderUpdateIdiomForm(props)} />
@@ -81,8 +111,8 @@ const renderIdiom = (props: RouteChildrenProps<any>) => {
   const { slug } = props!.match!.params;
   return <Idiom {...props} slug={slug} />;
 };
-const renderListView = (props: RouteProps, filter: string | null, lang: string | null) => {
-  return <IdiomListView filter={filter} language={lang} />;
+const renderListView = (props: RouteProps, filter: string | null, lang: string | null, page: string | null, onPageChange: ((page: string) => void)) => {
+  return <IdiomListView filter={filter} language={lang} page={page} onPageChange={onPageChange} />;
 };
 
 const renderNewIdiomForm = (props: RouteProps) => {
