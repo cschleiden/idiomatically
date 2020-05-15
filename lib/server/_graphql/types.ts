@@ -165,6 +165,11 @@ export type MutationRemoveEquivalentArgs = {
 };
 
 
+export type MutationComputeEquivalentClosureArgs = {
+  forceRun?: Maybe<Scalars['Boolean']>;
+};
+
+
 export type MutationAcceptIdiomChangeProposalArgs = {
   proposalId: Scalars['ID'];
   body?: Maybe<Scalars['String']>;
@@ -496,7 +501,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteIdiom?: Resolver<ResolversTypes['IdiomOperationResult'], ParentType, ContextType, RequireFields<MutationDeleteIdiomArgs, 'idiomId'>>,
   addEquivalent?: Resolver<ResolversTypes['IdiomOperationResult'], ParentType, ContextType, RequireFields<MutationAddEquivalentArgs, 'idiomId' | 'equivalentId'>>,
   removeEquivalent?: Resolver<ResolversTypes['IdiomOperationResult'], ParentType, ContextType, RequireFields<MutationRemoveEquivalentArgs, 'idiomId' | 'equivalentId'>>,
-  computeEquivalentClosure?: Resolver<ResolversTypes['IdiomOperationResult'], ParentType, ContextType>,
+  computeEquivalentClosure?: Resolver<ResolversTypes['IdiomOperationResult'], ParentType, ContextType, RequireFields<MutationComputeEquivalentClosureArgs, never>>,
   acceptIdiomChangeProposal?: Resolver<ResolversTypes['IdiomOperationResult'], ParentType, ContextType, RequireFields<MutationAcceptIdiomChangeProposalArgs, 'proposalId'>>,
   rejectIdiomChangeProposal?: Resolver<ResolversTypes['IdiomOperationResult'], ParentType, ContextType, RequireFields<MutationRejectIdiomChangeProposalArgs, 'proposalId'>>,
 };

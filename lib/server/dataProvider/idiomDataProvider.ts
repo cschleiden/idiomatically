@@ -262,11 +262,13 @@ export class IdiomDataProvider {
         const message = `Updated ${successes}, deleted: ${deletes} and failed ${failures}`;
         const statusId = closureStatus ? closureStatus._id : new ObjectID();
         await this.closureStatusCollection.updateOne({ partition: "1", _id: statusId }, {
-            _id: statusId,
-            lastRunDate: lastRunDate,
-            nextRunDate: nextRunDate,
-            resultMessage: message,
-            partition: "1"
+            $set: {
+                _id: statusId,
+                lastRunDate: lastRunDate,
+                nextRunDate: nextRunDate,
+                resultMessage: message,
+                partition: "1"
+            }
         }, { upsert: true });
 
         return this.operationResult(failures == 0 ? OperationStatus.Success : OperationStatus.Failure, message);

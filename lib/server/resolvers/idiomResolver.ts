@@ -2,11 +2,12 @@ import {
     QueryResolvers, MutationResolvers,
     MutationUpdateIdiomArgs, MutationCreateIdiomArgs, MutationDeleteIdiomArgs,
     MutationAddEquivalentArgs, MutationRemoveEquivalentArgs,
-    QueryIdiomArgs, QueryIdiomsArgs, IdiomConnection, PageInfo, IdiomEdge
+    QueryIdiomArgs, QueryIdiomsArgs, IdiomConnection, PageInfo, IdiomEdge, IdiomOperationResult, OperationStatus, MutationComputeEquivalentClosureArgs
 } from "../_graphql/types";
 import { GlobalContext, IdiomExpandOptions } from '../model/types';
 import { GraphQLResolveInfo } from 'graphql';
 import { traverse } from './traverser';
+import { EquivalentClosureJob } from '../jobScheduler';
 
 export default {
     Query: {
@@ -75,8 +76,18 @@ export default {
         removeEquivalent: async (parent, args: MutationRemoveEquivalentArgs, context: GlobalContext, info) => {
             return await context.dataProviders.idiom.removeIdiomEquivalent(context.currentUser, args.idiomId, args.equivalentId);
         },
-        computeEquivalentClosure: async (parent, args, context: GlobalContext, info) => {
-            return await context.dataProviders.idiom.computeEquivalentClosure();
+        computeEquivalentClosure: async (parent, args: MutationComputeEquivalentClosureArgs, context: GlobalContext, info) => {
+            if (args.forceRun) {
+                return await context.dataProviders.idiom.computeEquivalentClosure();
+            }
+            else {
+                const isRunning = !!EquivalentClosureJob.running;
+                const nextRunDate = EquivalentClosureJob.nextDate();
+                return {
+                    status: OperationStatus.Success,
+                    message: `Next scheduled run is on ${nextRunDate}, isRunning: ${isRunning}`
+                } as IdiomOperationResult
+            }
         }
 
     } as MutationResolvers

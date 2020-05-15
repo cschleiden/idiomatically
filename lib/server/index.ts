@@ -24,6 +24,8 @@ import { setupSSR } from './ssr';
 import { createDataProviders } from './dataProvider/dataProviderFactory';
 import { DataProviders } from './dataProvider/dataProviders';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
+import { initializeJobs, stopJobs } from './jobScheduler';
+
 
 const start = async () => {
   try {
@@ -37,7 +39,7 @@ const start = async () => {
 
     appInsights.setup(process.env.APP_INSIGHTS_KEY).start()
     appInsights.start();
-    
+
     const isProd = process.env.NODE_ENV === 'production';
     const serverUrl = process.env.SERVER_URL;
     const clientUrl = process.env.CLIENT_URL;
@@ -49,6 +51,9 @@ const start = async () => {
     const mongoConnection = await MongoClient.connect(dbConnection, { useNewUrlParser: true, useUnifiedTopology: true });
     const mongodb = mongoConnection.db(process.env.MONGO_DB);
     const dataProviders = createDataProviders(mongodb, isProd);
+
+
+    await initializeJobs(dataProviders);
 
     const schema = makeExecutableSchema({
       typeDefs,
@@ -233,4 +238,15 @@ function setupAuthAndSession(mongoConnection: MongoClient, app: express.Applicat
 }
 
 
-process.on('SIGINT', () => { console.log("Adios!"); process.exit(); })
+
+process.on('SIGTERM', () => {
+  console.log("Adios!");
+  stopJobs();
+  process.exit();
+});
+
+process.on('SIGINT', () => {
+  console.log("Adios!");
+  stopJobs();
+  process.exit();
+});

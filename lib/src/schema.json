@@ -1572,7 +1572,18 @@
           {
             "name": "computeEquivalentClosure",
             "description": null,
-            "args": [],
+            "args": [
+              {
+                "name": "forceRun",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
             "type": {
               "kind": "NON_NULL",
               "name": null,
