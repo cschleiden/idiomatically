@@ -12,6 +12,7 @@ import { RouteChildrenProps } from "react-router";
 import { UpdateIdiom } from "../pages/UpdateIdiom";
 import { ChangeProposals } from "../pages/ChangeProposals";
 import { SearchBox } from "./SearchBox";
+import { useCallback } from "react";
 const { Header, Footer, Content } = Layout;
 
 export interface AppProps {
